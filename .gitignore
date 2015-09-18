@@ -1,0 +1,9 @@
+db/*
+!db/.gitkeep
+nvd_data/*
+!nvd_data/.gitkeep
+log/*
+!log/.gitkeep
+tmp/*
+!tmp/.gitkeep
+coverage
