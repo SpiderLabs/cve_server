@@ -1,0 +1,72 @@
+#!/usr/bin/env ruby
+$LOAD_PATH.unshift File.expand_path(File.join('..', '..', '/lib'), __FILE__)
+require 'nokogiri'
+require 'net/http'
+require 'cve_server'
+
+def fetch_page(url)
+  uri = URI.parse(url)
+  use_ssl = uri.scheme == 'https'
+  Net::HTTP.start(uri.host, uri.port, use_ssl: use_ssl) do |http|
+    response = http.request_get(uri)
+    case response
+    when Net::HTTPSuccess then
+      response
+    when Net::HTTPRedirection then
+      location = response['location']
+      fail "redirected to #{location}"
+    else
+      response.value
+    end
+  end
+end
+
+def download_file(url, dest_path)
+  uri = URI.parse(url)
+  use_ssl = uri.scheme == 'https'
+  Net::HTTP.start(uri.host, uri.port, use_ssl: use_ssl) do |http|
+    http.request_get(uri.path) do |response|
+      case response
+      when Net::HTTPSuccess then
+        f = File.open(dest_path, 'w')
+        response.read_body do |seg|
+          f << seg
+          sleep 0.005
+        end
+        f.close
+      when Net::HTTPRedirection then
+        location = response['location']
+        fail "redirected to #{location}"
+      else
+        fail "Unable to download #{url}"
+      end
+    end
+  end
+end
+
+def dest_path(link)
+  filename = link.split('/').last
+  File.join(CVEServer::Boot.config.raw_data_path, filename)
+end
+
+response = fetch_page('https://nvd.nist.gov/download.cfm')
+
+if response.is_a?(Net::HTTPSuccess)
+  @doc = Nokogiri::HTML(response.body)
+  xml_file_path = '//td[@class="xml-file-type file-20"]'
+  @doc.xpath('//html').xpath(xml_file_path).each do |td|
+    link = td.xpath('a').first['href']
+    next unless link =~ /.gz$/
+
+    dest_path = dest_path(link)
+    downloaded_path = [dest_path, '.download'].join
+
+    puts "Downloading file from #{link}.."
+    download_file(link, downloaded_path)
+
+    if File.exist?(downloaded_path) && File.size?(downloaded_path)
+      File.delete(dest_path) if File.exist?(dest_path)
+      File.rename(downloaded_path, dest_path)
+    end
+  end
+end

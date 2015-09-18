@@ -1,0 +1,17 @@
+production:
+  database: cves_production
+  adapter: mongo
+  host: 127.0.0.1
+  port: 27017
+
+development:
+  database: cves_development
+  adapter: mongo
+  host: 127.0.0.1
+  port: 27017
+
+test:
+  database: cves_test
+  adapter: mongo
+  host: 127.0.0.1
+  port: 27017

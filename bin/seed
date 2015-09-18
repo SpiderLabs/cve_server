@@ -1,0 +1,18 @@
+#!/usr/bin/env ruby
+$LOAD_PATH.unshift File.expand_path(File.join('..', '..', '/lib'), __FILE__)
+require 'zlib'
+require 'cve_server'
+require 'cve_server/nvd/reader'
+
+files = File.join(CVEServer::Boot.config.raw_data_path, '*.xml.gz')
+
+CVEServer::Cve.drop_all
+Dir.glob(files).sort.each do |infile|
+  puts "Uncompressing #{infile}"
+  input = Zlib::GzipReader.open(infile).read
+  @doc = CVEServer::NVD::Reader.new(input)
+  puts 'Exporting data into the CVE collection'
+  CVEServer::Cve.bulk_create(@doc.all_cve)
+end
+puts "Reducing the cpe list"
+CVEServer::Cve.reduce_cpes
