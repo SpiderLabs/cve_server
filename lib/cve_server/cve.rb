@@ -12,8 +12,8 @@ module CVEServer
       remove_id(super(id: cve))
     end
 
-    def self.all_cpe_like(cpe)
-      all(cpes: /#{cpe}/i).collect do |h|
+    def self.all_cpe_equal(cpe)
+      all(cpes: { '$all': [/^cpe:\/\w:#{cpe}$/i] }).collect do |h|
         h['id']
       end.uniq.sort
     end
@@ -27,7 +27,7 @@ module CVEServer
         function() {
           var application_names = [];
           this.cpes.forEach(function(raw_cpe, index) {
-            var re = /\bcpe:\/\w:?([a-z0-9_\%\~\.\-]+?:[a-z0-9_\%\~\.\-]+)?:*\b/;
+            var re = /^cpe:\/\w:?([a-z0-9_\%\~\.\-\:]+)*/;
             var cpe = raw_cpe.match(re)[1];
             if ((application_names.indexOf(cpe) < 0) && (cpe))
               application_names.push(cpe);
