@@ -25,7 +25,7 @@ module CVEServer
     get '/v1/cpe/:cpe' do |cpe|
       bad_request unless valid_cpe?(cpe)
 
-      @cves = CVEServer::Cve.all_cpe_like(cpe.downcase)
+      @cves = CVEServer::Cve.all_cpe_equal(cpe.downcase)
       if @cves.count > 0
         json_resp @cves
       else
