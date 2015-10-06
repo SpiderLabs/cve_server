@@ -47,8 +47,7 @@ Simple REST-style web service for the CVE searching.
 
 * Search for CVEs related to a CPE
 
-        http://localhost:port/v1/cpe/php:php
-        http://localhost:port/v1/cpe/microsoft:windows
+        http://localhost:port/v1/cpe/apache:camel:2.11.3
 
 * List all the available CPEs
 

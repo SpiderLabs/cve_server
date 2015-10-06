@@ -8,7 +8,7 @@ module CVEServer
     end
 
     def valid_cpe?(cpe)
-      cpe.match(/^[a-z0-9_\%\~\.\-]+(:[a-z0-9_\%\~\.\-]+){0,1}$/i)
+      cpe.match(/^[a-z0-9_\%\~\.\-\:]+$/i)
     end
   end
 end
