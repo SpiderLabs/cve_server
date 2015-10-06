@@ -66,7 +66,6 @@ module HelperSpec
 
   def invalid_cpes
     [
-      '::::::::::::',
       '*:*:*',
       'amazon:*',
       '*:openbsd',
