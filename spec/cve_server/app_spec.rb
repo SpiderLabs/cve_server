@@ -135,6 +135,48 @@ describe CVEServer::App do
         expect(last_response.status).to eq(400)
       end
     end
+
+    describe 'GET /v1/cpe/cisco:ios:15.4%282%29t1' do
+      before :all do
+        @uri = URI::encode('/v1/cpe/cisco:ios:15.4%282%29t1')
+      end
+
+      it 'should be successful' do
+        get @uri
+        expect(last_response).to be_ok
+      end
+
+      it 'should be case insensitive' do
+        get @uri
+        expect(last_response).to be_ok
+      end
+
+      it 'should return content-type as json' do
+        get @uri
+        expect(response_content_type).to eq 'application/json'
+      end
+
+      it 'shoud not be emtpy' do
+        get @uri
+        expect(last_response).not_to be_empty
+      end
+
+      it 'should return json with a CVE array' do
+         get @uri
+         expect(json_response).to eq ["CVE-2015-0592"]
+      end
+
+      it 'should expect status equal to 200' do
+        get @uri
+        expect(last_response.status).to eq(200)
+      end
+
+      it 'should expect status equal to 200 using upcase characters' do
+        get @uri
+        expect(last_response.status).to eq(200)
+      end
+    end
+
   end
 
   describe 'Specs for /v1/cve' do
@@ -156,7 +198,7 @@ describe CVEServer::App do
 
       it 'should return json with an array with 18 CPE strings' do
         get '/v1/cpe'
-        expect(json_response.size).to eq 470
+        expect(json_response.size).to eq 482
       end
 
       it 'should expect status equal to 200' do
