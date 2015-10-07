@@ -31,11 +31,7 @@ Simple REST-style web service for the CVE searching.
 
         RACK_ENV=development ./bin/seed
 
-6. Create and populate the database.
-
-        RACK_ENV=development ./bin/seed
-
-7. Start the server.
+6. Start the server.
 
         RACK_ENV=development puma
 
@@ -60,3 +56,6 @@ Simple REST-style web service for the CVE searching.
 ## Additional Information
 
   * [Deploying the CVE Server with Capistrano and Ngnix](https://github.com/SpiderLabs/cve_server/wiki/Deploying-the-CVE-Server-with-Capistrano-and-Ngnix)
+
+## License
+  CVEServer is released under the [MIT License](http://www.opensource.org/licenses/MIT)
