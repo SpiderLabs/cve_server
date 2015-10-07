@@ -49,6 +49,10 @@ Simple REST-style web service for the CVE searching.
 
         http://localhost:port/v1/cpe/apache:camel:2.11.3
 
+        Don't forget to encode the URI if that has special characters, example:
+
+        URI::encode('/v1/cpe/cisco:ios:15.4%282%29t1')
+
 * List all the available CPEs
 
         http://localhost:port/v1/cpe/
