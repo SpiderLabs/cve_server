@@ -14,7 +14,7 @@ describe CVEServer::NVD::Reader do
   end
 
   it 'Should return 17 entries for CVEs' do
-    expect(@nvd_reader.all_cve.size).to eq 17
+    expect(@nvd_reader.all_cve.size).to eq 19
   end
 
   it 'Should pass each CVE as a Hash' do

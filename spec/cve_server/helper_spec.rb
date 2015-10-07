@@ -61,6 +61,14 @@ module HelperSpec
       'cisco:nexus_2232tm_fex_switch',
       'cisco:nexus_2248tp_e_fex_switch',
       'cisco:nexus_2248tp_fex_switch',
+      'splunk:splunk:6.2.0::~~light~~~',
+      'microsoft:windows_server_2012:r2::~~~x64~~',
+      'microsoft:windows_8.1:-',
+      'cisco:ios:15.3%28100%29m',
+      'cisco:ios:15.4%282%29t1',
+      'novell:suse_linux_for_vmware:11.0:sp3:~~server~~~',
+      'novell:suse_linux_sdk:11.0:sp3',
+      'oracle:berkeley_db:12.1.6.0.35'
     ]
   end
 
