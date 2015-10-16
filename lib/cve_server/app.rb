@@ -22,10 +22,16 @@ module CVEServer
       end
     end
 
-    get '/v1/cpe/:cpe' do |cpe|
-      bad_request unless valid_cpe?(cpe)
+    get '/v1/cpe/:cpes' do |cpes|
+      # Multiple cpes were included
+      if cpes.include?(",")
+        bad_request unless valid_cpes?(cpes)
+        @cves = CVEServer::Cve.all_cpes_equal(cpes.downcase)
+      else
+        bad_request unless valid_cpe?(cpes)
+        @cves = CVEServer::Cve.all_cpe_equal(cpes.downcase)
+      end
 
-      @cves = CVEServer::Cve.all_cpe_equal(cpe.downcase)
       if @cves.count > 0
         json_resp @cves
       else

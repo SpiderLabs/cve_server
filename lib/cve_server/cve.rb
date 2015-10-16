@@ -18,6 +18,12 @@ module CVEServer
       end.uniq.sort
     end
 
+    def self.all_cpes_equal(cpes)
+      cpes.split(",").collect do |cpe|
+        self.all_cpe_equal(cpe)
+      end.flatten.uniq.sort
+    end
+
     def self.reduce_cpes
       map_reduce(mapper, reducer, map_reducer_opts).count
     end

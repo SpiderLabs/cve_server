@@ -10,5 +10,10 @@ module CVEServer
     def valid_cpe?(cpe)
       cpe.match(/^[a-z0-9_\%\~\.\-\:]+$/i)
     end
+
+    def valid_cpes?(cpes)
+      cpes.split(",").all? { |cpe| valid_cpe?(cpe) }
+    end
+
   end
 end
