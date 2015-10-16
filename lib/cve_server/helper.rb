@@ -12,7 +12,7 @@ module CVEServer
     end
 
     def valid_cpes?(cpes)
-      cpes.split(",").all? { |cpe| valid_cpe?(cpe) }
+      cpes.split(",").all? { |cpe| valid_cpe?(cpe) } ? true : nil
     end
 
   end

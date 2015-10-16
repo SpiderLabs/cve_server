@@ -35,7 +35,7 @@ module HelperSpec
     ]
   end
 
-  def cpes
+  def individual_cpes
     [
       '1two:livre_d_or',
       '1und1:1%261_online_storage',
@@ -72,13 +72,32 @@ module HelperSpec
     ]
   end
 
-  def invalid_cpes
+  def invalid_individual_cpes
     [
       '*:*:*',
       'amazon:*',
       '*:openbsd',
       '\*:linux',
       '%\?pple:mac_os_x',
+    ]
+  end
+
+  def bulk_cpes
+    [
+      '1two:livre_d_or,1und1:1%261_online_storage',
+      'amarok:amarok,amarok:web_frontend',
+      'apple:mac_os,apple:mac_os_runtime_for_java',
+      'cisco:nac_manager,cisco:netflow_collection_engine',
+    ]
+  end
+
+  def invalid_bulk_cpes
+    [
+      '1two:livre_d_or,*:*:*',
+      'apple:mac_os,amazon:*',
+      'amarok:amarok,*:openbsd',
+      'cisco:nexus_1000v,\*:linux',
+      '%\?pple:mac_os_x,amarok:amarok',
     ]
   end
 end
@@ -103,15 +122,31 @@ describe 'CVEServer::Helper' do
   end
 
   describe 'CPE Validations' do
-    HelperSpec.cpes.each do |cpe|
-      it "should validates '#{cpe}'" do
-        expect(@module.valid_cpe?(cpe)).not_to be eq(nil)
+    describe '#valid_cpe?' do
+      HelperSpec.individual_cpes.each do |cpe|
+        it "should validates '#{cpe}'" do
+          expect(@module.valid_cpe?(cpe)).not_to be eq(nil)
+        end
+      end
+
+      HelperSpec.invalid_individual_cpes.each do |cpe|
+        it "should not validates '#{cpe}'" do
+          expect(@module.valid_cpe?(cpe)).to eq(nil)
+        end
       end
     end
 
-    HelperSpec.invalid_cpes.each do |cpe|
-      it "should not validates '#{cpe}'" do
-        expect(@module.valid_cpe?(cpe)).to eq(nil)
+    describe '#valid_cpes?' do
+      HelperSpec.bulk_cpes.each do |cpe|
+        it "should validates '#{cpe}'" do
+          expect(@module.valid_cpes?(cpe)).not_to be eq(nil)
+        end
+      end
+
+      HelperSpec.invalid_bulk_cpes.each do |cpe|
+        it "should not validates '#{cpe}'" do
+          expect(@module.valid_cpes?(cpe)).to eq(nil)
+        end
       end
     end
   end
