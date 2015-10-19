@@ -33,7 +33,7 @@ module CVEServer
         function() {
           var application_names = [];
           this.cpes.forEach(function(raw_cpe, index) {
-            var re = /^cpe:\/\w:?([a-z0-9_\%\~\.\-\:]*)/;
+            var re = /^cpe:\/\w:?([a-z0-9_\%\~\.\-\:]*)*/;
             var cpe = raw_cpe.match(re)[1];
             if ((application_names.indexOf(cpe) < 0) && (cpe))
               application_names.push(cpe);
