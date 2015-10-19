@@ -177,6 +177,55 @@ describe CVEServer::App do
       end
     end
 
+    describe 'GET /v1/cpe/apache:camel:2.11.3,mariadb:mariadb:5.5.34' do
+      it 'should be successful' do
+        get '/v1/cpe/apache:camel:2.11.3,mariadb:mariadb:5.5.34'
+        expect(last_response).to be_ok
+      end
+
+      it 'should be case insensitive' do
+        get '/v1/cpe/apache:CAMEL:2.11.3,mariadb:MARIADB:5.5.34'
+        expect(last_response).to be_ok
+      end
+
+      it 'should return content-type as json' do
+        get '/v1/cpe/apache:camel:2.11.3'
+        expect(response_content_type).to eq 'application/json'
+      end
+
+      it 'shoud not be emtpy' do
+        get '/v1/cpe/apache:camel:2.11.3,mariadb:mariadb:5.5.34'
+        expect(last_response).not_to be_empty
+      end
+
+      it 'should return json with a CVE array' do
+        get '/v1/cpe/apache:camel:2.11.3,mariadb:mariadb:5.5.34'
+        expect(json_response).to eq ['CVE-2014-0001', 'CVE-2014-0002', 'CVE-2014-0003']
+      end
+
+      it 'should expect status equal to 200' do
+        get '/v1/cpe/apache:camel:2.11.3,mariadb:mariadb:5.5.34'
+        expect(last_response.status).to eq(200)
+      end
+
+      it 'should expect status equal to 200 using upcase characters' do
+        get '/v1/cpe/apache:CAMEL:2.11.3,mariadb:mariadb:5.5.34'
+        expect(last_response.status).to eq(200)
+      end
+    end
+
+    describe 'GET /v1/cpe/bad$requests+' do
+      it 'should return invalid parameters message' do
+        get '/v1/cpe/mariadb:mariadb:5.5.34,bad$request+'
+        expect(json_response['error']).to eq 'invalid-parameters'
+      end
+
+      it 'should return status equel to 400' do
+        get '/v1/cpe/mariadb:mariadb:5.5.34,bad$request+'
+        expect(last_response.status).to eq(400)
+      end
+    end
+
   end
 
   describe 'Specs for /v1/cve' do
