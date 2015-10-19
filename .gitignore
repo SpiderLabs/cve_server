@@ -7,3 +7,4 @@ log/*
 tmp/*
 !tmp/.gitkeep
 coverage
+config/database.yml
