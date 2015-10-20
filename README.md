@@ -39,7 +39,7 @@ Simple REST-style web service for the CVE searching.
 
 * Search for an specific CVE using its ID
 
-        http://localhost:port/v1/cve/CVE-ID
+        http://localhost:port/v1/cve/CVE-2015-3900
 
 * Search for CVEs related to a CPE
 
