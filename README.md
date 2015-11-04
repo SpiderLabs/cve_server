@@ -41,7 +41,18 @@ Simple REST-style web service for the CVE searching.
 
         http://localhost:port/v1/cve/CVE-2015-3900
 
-* Search for CVEs related to a CPE
+
+* Search for CVEs related to a CPE without versions
+
+        http://localhost:port/v1/cpe/apache:camel
+
+        http://localhost:port/v1/cpe/apache:camel,apache:http_server
+
+* List all the available CPEs with versions
+
+        http://localhost:port/v1/cpe
+
+* Search for CVEs related to a CPE with versions
 
         http://localhost:port/v1/cpe/apache:camel:2.11.3
 
@@ -51,9 +62,9 @@ Simple REST-style web service for the CVE searching.
 
         URI::encode('/v1/cpe/cisco:ios:15.4%282%29t1')
 
-* List all the available CPEs
+* List all the available CPEs with versions
 
-        http://localhost:port/v1/cpe/
+        http://localhost:port/v1/cpe_with_versions
 
 ## Additional Information
 
