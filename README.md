@@ -54,13 +54,13 @@ Simple REST-style web service for the CVE searching.
 
 * Search for CVEs related to a CPE with versions
 
-        http://localhost:port/v1/cpe/apache:camel:2.11.3
+        http://localhost:port/v1/cpe_with_version/apache:camel:2.11.3
 
-        http://localhost:port/v1/cpe/apache:camel:2.11.3,apache:http_server:2.4.4
+        http://localhost:port/v1/cpe_with_version/apache:camel:2.11.3,apache:http_server:2.4.4
 
         Don't forget to encode the URI if that has special characters, example:
 
-        URI::encode('/v1/cpe/cisco:ios:15.4%282%29t1')
+        URI::encode('/v1/cpe_with_version/cisco:ios:15.4%282%29t1')
 
 * List all the available CPEs with versions
 
