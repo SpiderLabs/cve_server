@@ -12,29 +12,44 @@ module CVEServer
       remove_id(super(id: cve))
     end
 
-    def self.all_cpe_equal(cpe)
-      all(cpes: { '$all': [/^cpe:\/\w:#{cpe}$/i] }).collect do |h|
-        h['id']
-      end.uniq.sort
-    end
-
     def self.all_cpes_equal(cpes)
       cpes.split(",").collect do |cpe|
         self.all_cpe_equal(cpe)
       end.flatten.uniq.sort
     end
 
-    def self.reduce_cpes
-      map_reduce(mapper, reducer, map_reducer_opts).count
+    def self.all_cpe_equal(cpe)
+      all(cpes: /^#{cpe}$/i).collect do |h|
+        h['id']
+      end.uniq.sort
     end
 
-    def self.mapper
-      %q(
+    def self.all_cpes_with_version_equal(cpes)
+      cpes.split(",").collect do |cpe|
+        self.all_cpe_with_version_equal(cpe)
+      end.flatten.uniq.sort
+    end
+
+    def self.all_cpe_with_version_equal(cpe)
+      all(cpes_with_version: /^#{cpe}$/i).collect do |h|
+        h['id']
+      end.uniq.sort
+    end
+
+    def self.reduce_cpes
+      total_count = 0
+      ["cpes", "cpes_with_version"].each do |field|
+        total_count += map_reduce(mapper(field), reducer, map_reducer_opts(field)).count
+      end
+
+      return total_count
+    end
+
+    def self.mapper(field)
+      %Q(
         function() {
           var application_names = [];
-          this.cpes.forEach(function(raw_cpe, index) {
-            var re = /^cpe:\/\w:?([a-z0-9_\%\~\.\-\:]*)*/;
-            var cpe = raw_cpe.match(re)[1];
+          this.#{field}.forEach(function(cpe, index) {
             if ((application_names.indexOf(cpe) < 0) && (cpe))
               application_names.push(cpe);
           });
@@ -55,8 +70,9 @@ module CVEServer
       )
     end
 
-    def self.map_reducer_opts
-      { out: { replace: 'cpes' }, raw: true }
+    def self.map_reducer_opts(field)
+      { out: { replace: field }, raw: true }
     end
+
   end
 end

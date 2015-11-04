@@ -19,7 +19,8 @@ module CVEServer
           updated_at: xpath_content('.//vuln:last-modified-datetime'),
           cvss: CVEServer::NVD::Cvss.new(cvss).to_hash,
           references: references,
-          cpes: cpes
+          cpes: cpes,
+          cpes_with_version: cpes_with_version
         }
       end
 
@@ -55,7 +56,17 @@ module CVEServer
 
       def cpes
         path = './/vuln:vulnerable-software-list/vuln:product'
-        @entry.xpath(path).collect(&:content)
+        full_cpes = remove_cpe_text(@entry.xpath(path).collect(&:content))
+        full_cpes.map {|cpe| cpe.split(":")[0..1].join(":")}.uniq
+      end
+
+      def cpes_with_version
+        path = './/vuln:vulnerable-software-list/vuln:product'
+        remove_cpe_text(@entry.xpath(path).collect(&:content))
+      end
+
+      def remove_cpe_text(cpes)
+        cpes.map {|cpe| cpe.gsub(/^cpe:\/\w:/,"")}
       end
     end
   end

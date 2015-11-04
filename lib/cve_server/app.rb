@@ -14,25 +14,25 @@ module CVEServer
     get '/v1/cve/:cve' do |cve|
       bad_request unless valid_cve?(cve)
 
-      @cve = CVEServer::Cve.find(cve.upcase)
-      if @cve
-        json_resp @cve
+      cve = CVEServer::Cve.find(cve.upcase)
+      if cve
+        json_resp cve
       else
         not_found
       end
     end
 
-    get '/v1/cpe/:cpes' do |cpes|
-      if cpes.include?(",")
-        # Multiple cpes were included
-        bad_request unless valid_cpes?(cpes)
+    get '/v1/cpe/:cpe_str' do |cpe_str|
+      # Multiple cpes were included
+      if cpe_str.include?(",")
+        bad_request unless valid_cpes?(cpe_str)
       else
-        bad_request unless valid_cpe?(cpes)
+        bad_request unless valid_cpe?(cpe_str)
       end
 
-      @cves = CVEServer::Cve.all_cpes_equal(cpes.downcase)
-      if @cves.count > 0
-        json_resp @cves
+      cves = CVEServer::Cve.all_cpes_equal(cpe_str.downcase)
+      if cves.count > 0
+        json_resp cves
       else
         not_found
       end
@@ -40,6 +40,26 @@ module CVEServer
 
     get '/v1/cpe' do
       json_resp CVEServer::Cpe.all
+    end
+
+    get '/v1/cpe_with_version/:cpe_str' do |cpe_str|
+      # Multiple cpes were included
+      if cpe_str.include?(",")
+        bad_request unless valid_cpes_with_version?(cpe_str)
+      else
+        bad_request unless valid_cpe_with_version?(cpe_str)
+      end
+
+      cves = CVEServer::Cve.all_cpes_with_version_equal(cpe_str.downcase)
+      if cves.count > 0
+        json_resp cves
+      else
+        not_found
+      end
+    end
+
+    get '/v1/cpe_with_version' do
+      json_resp CVEServer::CpeWithVersion.all
     end
 
     private
