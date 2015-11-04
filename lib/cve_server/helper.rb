@@ -8,11 +8,19 @@ module CVEServer
     end
 
     def valid_cpe?(cpe)
-      cpe.match(/^[a-z0-9_\%\~\.\-\:]+$/i)
+      cpe.match(/^[a-z0-9_\%\~\.\-]+\:[a-z0-9_\%\~\.\-]+$/i)
     end
 
     def valid_cpes?(cpes)
       cpes.split(",").all? { |cpe| valid_cpe?(cpe) } ? true : nil
+    end
+
+    def valid_cpe_with_version?(cpe)
+      cpe.match(/^[a-z0-9_\%\~\.\-\:]+$/i)
+    end
+
+    def valid_cpes_with_version?(cpes)
+      cpes.split(",").all? { |cpe| valid_cpe_with_version?(cpe) } ? true : nil
     end
 
   end

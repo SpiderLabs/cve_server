@@ -2,10 +2,10 @@ require 'cve_server/db/document'
 
 module CVEServer
   # CVEServer::Cpe is a module to abstract the database table/collection
-  # to store and read the CPEs.
-  class Cpe
+  # to store and read the CPEs that have version information with it.
+  class CpeWithVersion
     include CVEServer::DB::Document
-    collection_name :cpes
+    collection_name :cpes_with_version
 
     def self.all
       super.collect {|cpe| cpe['_id']}.sort
