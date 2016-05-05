@@ -53,9 +53,9 @@ response = fetch_page('https://nvd.nist.gov/download.cfm')
 
 if response.is_a?(Net::HTTPSuccess)
   @doc = Nokogiri::HTML(response.body)
-  xml_file_path = '//td[@class="xml-file-type file-20"]'
-  @doc.xpath('//html').xpath(xml_file_path).each do |td|
-    link = td.xpath('a').first['href']
+  xml_file_path = '//tr[@class="xml-feed-data-row"]/td[@class="xml-file-type file-20"]/a[text() = "https"]/@href'
+  @doc.xpath('//html').xpath(xml_file_path).each do |href|
+    link = href.value
     next unless link =~ /.gz$/
 
     dest_path = dest_path(link)
