@@ -13,10 +13,10 @@ Simple REST-style web service for the CVE searching.
 
 ### Install the CVE Server
 
-It is required you have installed: Ruby (with rvm), Git, MongoDB and Ngnix.
+You must have running ruby, git, mongodb and nginx in your local machine.
 
 ```
-curl -sSL  https://raw.githubusercontent.com/SpiderLabs/cve_server/install_sh/scripts/install.sh | bash -
+curl --ssl -s https://raw.githubusercontent.com/SpiderLabs/cve_server/install_sh/scripts/install.sh | bash -
 ```
 
 ## Using the API
