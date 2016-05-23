@@ -27,9 +27,9 @@ curl --ssl -s https://raw.githubusercontent.com/SpiderLabs/cve_server/install_sh
 
 * Search for CVEs related to a CPE without versions
 
-  * http://localhost:port/v1/cpe/apache:camel
+  * http://localhost:port/v1/cpe/apache:spark
 
-  * http://localhost:port/v1/cpe/apache:camel,apache:http_server
+  * http://localhost:port/v1/cpe/apache:spark,apache:http_server
 
 * List all the available CPEs with versions
 
@@ -37,8 +37,8 @@ curl --ssl -s https://raw.githubusercontent.com/SpiderLabs/cve_server/install_sh
 
 * Search for CVEs related to a CPE with versions
 
-  * http://localhost:port/v1/cpe_with_version/apache:camel:2.11.3
-  * http://localhost:port/v1/cpe_with_version/apache:camel:2.11.3,apache:http_server:2.4.4
+  * http://localhost:port/v1/cpe_with_version/samba:samba:4.0.0
+  * http://localhost:port/v1/cpe_with_version/samba:samba:4.0.0,apache:http_server:2.4.4
   * Don't forget to encode the URI if that has special characters, example:
     * URI::encode('/v1/cpe_with_version/cisco:ios:15.4%282%29t1')
 
