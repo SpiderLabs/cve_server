@@ -79,18 +79,71 @@ seed_collections()
   ${__program}
 }
 
-start_app()
+start_puma()
 {
   local __program='bundle exec puma'
   export RACK_ENV=$rack_env
   ${__program}
 }
 
-verify_required_programs
-clone_git_repository
-cd $dest_dir
-install_ruby_bundler
-install_ruby_gems
-download_nvd_reports
-seed_collections
-start_app
+puma_instructions()
+{
+  echo $(printf "%0.s=" {1..74})
+  echo "Test your local server at http://0.0.0.0:9292/v1/cve/CVE-2015-6939"
+  echo -e "Check the README.md file to look for the available API actions.\n"
+}
+
+crontab_instructions()
+{
+  echo $(printf "%0.s=" {1..74})
+  echo "To update daily your local mongodb collections from NVD"
+  echo -e "you could add the following line into your crontab: \n"
+  APP_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+  update_db_path="$(pwd)/scripts/update_db.sh"
+  echo -e "00 2 * * * $update_db_path\n"
+}
+
+
+ngnix_conf()
+{
+  echo $(printf "%0.s=" {1..74})
+  echo -e "You must add the following configuration into  you ngnix server:\n"
+cat << EOF
+
+upstream cve_server {
+  server unix://$(pwd)/shared/tmp/sockets/puma.sock;
+}
+
+server {
+  listen 80 default_server;
+  root $(pwd)/public;
+
+  server_name localhost;
+  location / {
+    proxy_pass http://cve_server;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_buffering off;
+  }
+}
+EOF
+}
+
+install() {
+  verify_required_programs
+  clone_git_repository
+  cd $dest_dir
+  install_ruby_bundler
+  install_ruby_gems
+  download_nvd_reports
+  seed_collections
+  start_puma
+  if ps awx| grep puma> /dev/null;
+  then
+    puma_instructions
+    ngnix_conf
+    crontab_instructions
+  fi
+}
+
+install
