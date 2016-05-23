@@ -96,18 +96,17 @@ puma_instructions()
 crontab_instructions()
 {
   echo $(printf "%0.s=" {1..74})
-  echo "To update daily your local mongodb collections from NVD"
-  echo -e "you could add the following line into your crontab: \n"
+  echo -e "The daily update from NVD could be executed from your crontab:\n"
   APP_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
   update_db_path="$(pwd)/scripts/update_db.sh"
   echo -e "00 2 * * * $update_db_path\n"
 }
 
-
+ßß
 ngnix_conf()
 {
   echo $(printf "%0.s=" {1..74})
-  echo -e "You must add the following configuration into  you ngnix server:\n"
+  echo -e "You could add the following configuration into you ngnix server:\n"
 cat << EOF
 
 upstream cve_server {
@@ -126,6 +125,7 @@ server {
     proxy_buffering off;
   }
 }
+
 EOF
 }
 
@@ -138,7 +138,7 @@ install() {
   download_nvd_reports
   seed_collections
   start_puma
-  if ps awx| grep puma> /dev/null;
+  if ps awx| grep puma > /dev/null;
   then
     puma_instructions
     ngnix_conf
