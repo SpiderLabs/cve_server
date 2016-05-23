@@ -102,7 +102,6 @@ crontab_instructions()
   echo -e "00 2 * * * $update_db_path\n"
 }
 
-ßß
 ngnix_conf()
 {
   echo $(printf "%0.s=" {1..74})
