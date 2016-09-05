@@ -27,7 +27,7 @@ module CVEServer
       private
 
       def xpath_content(path, node = @entry)
-        node.xpath(path)[0].content
+        node.xpath(path)[0].content unless node.xpath(path)[0].nil?
       end
 
       def cwe_id
