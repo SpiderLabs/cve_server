@@ -4,7 +4,7 @@ require 'cve_server/nvd/entry'
 module CVEServer
   module NVD
     # CVEServer::NVD::Reader provides an easy way to read the reports
-    # (version 2.0) from the National CVEServererability Database.
+    # (version 2.0) from the National Vulnerability Database.
     #
     # https://nvd.nist.gov/download.cfm
     class Reader
