@@ -2,7 +2,7 @@ require 'cve_server/nvd/cvss'
 module CVEServer
   module NVD
     # CVEServer::NVD::Entry provides an easy way to parse entries from the
-    # reports from the National CVEServererability Database.
+    # reports from the National Vulnerability Database.
     #
     # https://nvd.nist.gov/download.cfm
     class Entry
