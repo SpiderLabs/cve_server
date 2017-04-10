@@ -49,11 +49,12 @@ def dest_path(link)
   File.join(CVEServer::Boot.config.raw_data_path, filename)
 end
 
-response = fetch_page('https://nvd.nist.gov/download.cfm')
+data_url = 'https://nvd.nist.gov/vuln/data-feeds'
+response = fetch_page(data_url)
 
 if response.is_a?(Net::HTTPSuccess)
   @doc = Nokogiri::HTML(response.body)
-  xml_file_path = '//tr[@class="xml-feed-data-row"]/td[@class="xml-file-type file-20"]/a[text() = "https"]/@href'
+  xml_file_path = '//tr[@class="xml-feed-data-row"]/td[@class="xml-file-type file-20"]/a[text()]/@href'
   @doc.xpath('//html').xpath(xml_file_path).each do |href|
     link = href.value
     next unless link =~ /.gz$/
