@@ -55,11 +55,13 @@ response = fetch_page(data_url)
 if response.is_a?(Net::HTTPSuccess)
   @doc = Nokogiri::HTML(response.body)
   xml_file_path = '//table[@data-testid="vuln-feed-table"]/tbody' \
-                  '/tr[@data-testid="vuln-xml-feed-row-recent-gzip"]' \
+                  '/tr[@data-testid="vuln-xml-feed-row-recent-gzip" ' \
+                  'or @data-testid="vuln-xml-feed-row-modified-gzip"]' \
                   '/td[@class="xml-file-type file-20"]/a[text()]/@href'
   @doc.xpath('//html').xpath(xml_file_path).each do |href|
     link = href.value
-    next unless link =~ /nvdcve-2.0-(\w*|\d{4}).xml.gz$/
+    # CveServer just include support for NVD reports version 2.0
+    next unless link =~ /nvdcve-2.0-(modified|recent|\d{4}).xml.gz$/
 
     dest_path = dest_path(link)
     downloaded_path = [dest_path, '.download'].join
