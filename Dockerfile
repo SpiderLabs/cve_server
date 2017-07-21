@@ -2,7 +2,7 @@ FROM ruby:2.2.3
 MAINTAINER Jonathan Claudius
 COPY . /app
 RUN apt-get update && \
-    apt-get install -y build-essential libreadline-dev libssl-dev libpq5 libpq-dev libreadline5 libsqlite3-dev libpcap-dev git-core autoconf postgresql pgadmin3 curl zlib1g-dev libxml2-dev libxslt1-dev vncviewer libyaml-dev curl zlib1g-dev rubygems ruby-dev
+    apt-get install -y build-essential libreadline-dev libssl-dev libreadline5 libsqlite3-dev libpcap-dev git-core autoconf curl zlib1g-dev libxml2-dev libxslt1-dev libyaml-dev curl zlib1g-dev rubygems ruby-dev
 RUN apt-get install -y bc git mongodb
 CMD service mongodb start && \
     mkdir test && \
