@@ -1,0 +1,14 @@
+language: ruby
+
+matrix:
+  - rvm: 2.2.3
+    env:
+      - LABEL=unit_tests
+
+script:
+  - bundle install
+  - RACK_ENV=test ./bin/seed
+  - bundle exec rspec
+
+services:
+  - mongodb
