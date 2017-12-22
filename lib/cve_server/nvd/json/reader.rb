@@ -10,7 +10,7 @@ module CVEServer
         end
 
         def all_entries
-          @json['CVE_Items']
+          @json.is_a?(Hash) && @json.key?('CVE_Items') ? @json['CVE_Items'] : []
         end
 
         def all_cve
