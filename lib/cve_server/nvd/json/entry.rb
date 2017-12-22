@@ -88,7 +88,7 @@ module CVEServer
           full_cpes.map { |cpe| cpe.gsub(/^cpe:\/\w:/, '') }.uniq
         end
 
-        #private
+        private
         def attribute(node, attr)
           @entry[node][attr] if @entry.key?(node) && @entry[node].key?(attr)
         end

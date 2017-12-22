@@ -5,7 +5,8 @@ require 'cve_server/nvd/json/entry'
 describe CVEServer::NVD::JSON::Entry do
   context 'when it receives a valid entry from the NVD dataset' do
     let(:infile) {
-      File.expand_path('../../../../fixtures/nvd_data/partial-nvdcve-1.0.json.gz', __FILE__)
+      json_file = '../../../../fixtures/nvd_data/partial-nvdcve-1.0.json.gz'
+      File.expand_path(json_file, __FILE__)
     }
     let(:input) { Zlib::GzipReader.open(infile).read }
     let(:json) { JSON.parse(input) }
@@ -21,13 +22,12 @@ describe CVEServer::NVD::JSON::Entry do
 
     describe '#summary' do
       it 'should return the expected summary' do
-        s = "Microsoft Windows 10 Gold, 1511, and 1607; Windows 8.1; Wind" \
-            "ows RT 8.1; Windows Server 2012 R2, and Windows Server 2016 " \
-            "do not properly handle certain requests in SMBv2 and SMBv3 p"\
-            "ackets, which allows remote attackers to execute arbitrary c"\
-            "ode via a crafted SMBv2 or SMBv3 packet to the Server servic"\
-            "e, aka \"SMBv2/SMBv3 Null Dereference Denial of Service Vulne"\
-            "rability.\""
+        s = "Microsoft Windows 10 Gold, 1511, and 1607; Windows 8.1; Windows " \
+            "RT 8.1; Windows Server 2012 R2, and Windows Server 2016 do not " \
+            "properly handle certain requests in SMBv2 and SMBv3 packets, " \
+            "which allows remote attackers to execute arbitrary code via a "  \
+            "crafted SMBv2 or SMBv3 packet to the Server service, aka "  \
+            "\"SMBv2/SMBv3 Null Dereference Denial of Service Vulnerability.\""
         expect(subject.summary).not_to be_nil
         expect(subject.summary).to eq(s)
       end
@@ -133,6 +133,77 @@ describe CVEServer::NVD::JSON::Entry do
         ]
         expect(subject.cpes_with_version).not_to be_nil
         expect(subject.cpes_with_version).to eq(expected_cpes)
+      end
+    end
+
+    describe '#to_hash' do
+      it 'should return an instance of Hash class' do
+        expect(subject.to_hash).to be_instance_of(Hash)
+      end
+      it 'should return a non-empty hash' do
+        expect(subject.to_hash).not_to be_empty
+      end
+    end
+
+    describe 'Private methods' do
+      describe '#attribute' do
+        context 'when the key exists' do
+          it 'should return the value' do
+            expect(subject.send(:attribute,'cve', 'description')).not_to be_empty
+          end
+        end
+        context 'when the key does not exist' do
+          it 'should return the nil value' do
+            expect(subject.send(:attribute,'cve', 'invalid_key')).to be_nil
+          end
+        end
+      end
+
+      describe '#time_at' do
+        context 'when there is a valid time string' do
+          it 'should parse the string and return a Time object' do
+            expect(subject.send(:time_at, 'publishedDate')).to be_instance_of(Time)
+          end
+        end
+        context 'when there is an invalid value' do
+          it 'should raise an TypeError exception' do
+            expect{ subject.send(:time_at,'cve') }.to raise_error(TypeError)
+          end
+        end
+        context 'when there is an invalid key' do
+          it 'should return nil' do
+            expect(subject.send(:time_at,'invalid_key')).to be_nil
+          end
+        end
+      end
+
+      describe '#normalize_key' do
+        context 'when there is a key with upcase characters' do
+          it 'should return a key with snake case format' do
+            expect(subject.send(:normalize_key, 'cvssScore')).to eq('cvss_score')
+          end
+        end
+        context 'when there is a key without upcase characters' do
+          it 'should return the key with the original string' do
+            expect(subject.send(:normalize_key, 'cvss')).to eq('cvss')
+          end
+        end
+      end
+
+      describe '#full_cpes' do
+        context 'when the configurations hash has values for the nodes key ' do
+          it 'shoudl return an array of 7 strings' do
+            expect(subject.send(:full_cpes)).not_to be_empty
+            expect(subject.send(:full_cpes).size).to eq(7)
+          end
+        end
+        context 'when the configurations hash does not have the nodes key' do
+          it 'should return an empty array' do
+            allow(subject).to receive(:attribute).with('configurations', 'nodes')
+              .and_return(nil)
+            expect(subject.send(:full_cpes)).to be_empty
+          end
+        end
       end
     end
   end
