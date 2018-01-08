@@ -11,6 +11,22 @@ matrix:
   - rvm: 2.4.1
     env:
       - LABEL=unit_tests
+  - rvm: 2.2.9
+    env:
+      - LABEL=unit_tests
+  - rvm: 2.3.6
+    env:
+      - LABEL=unit_tests
+  - rvm: 2.4.3
+    env:
+      - LABEL=unit_tests
+  - rvm: 2.5.0
+    env:
+      - LABEL=unit_tests
+
+before_install:
+  - gem update --system
+  - gem update --remote bundler
 
 script:
   - bundle install
