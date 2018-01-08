@@ -24,6 +24,10 @@ matrix:
     env:
       - LABEL=unit_tests
 
+before_install:
+  - gem update --system
+  - gem update --remote bundler
+
 script:
   - bundle install
   - RACK_ENV=test ./bin/seed
