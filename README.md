@@ -60,9 +60,14 @@ curl --ssl -s https://raw.githubusercontent.com/SpiderLabs/cve_server/master/scr
 
     bundle install
 
-  3. Download the raw data from the National Vulnerability Database
+  3. Download the raw data from the National Vulnerability Database. The supported
+  NVD reports are [XML 2.0 (by default) and JSON 1.0 files](https://nvd.nist.gov/vuln/data-feeds).
 
     ./bin/nvd_downloader
+
+    or
+
+    ./bin/nvd_downloader -f bson
 
   4. Configure your database.
 
@@ -71,6 +76,10 @@ curl --ssl -s https://raw.githubusercontent.com/SpiderLabs/cve_server/master/scr
   5. Create and populate the database for you environment.
 
     RACK_ENV=development ./bin/seed
+
+    or
+
+    RACK_ENV=development ./bin/seed -f bson
 
   6. Start the server.
 
