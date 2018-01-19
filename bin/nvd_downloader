@@ -2,6 +2,7 @@
 $LOAD_PATH.unshift File.expand_path(File.join('..', '..', '/lib'), __FILE__)
 require 'nokogiri'
 require 'net/http'
+require 'optparse'
 require 'cve_server'
 
 def fetch_page(url)
@@ -49,29 +50,52 @@ def dest_path(link)
   File.join(CVEServer::Boot.config.raw_data_path, filename)
 end
 
-data_url = 'https://nvd.nist.gov/vuln/data-feeds'
-response = fetch_page(data_url)
+def download_reports(file_ext)
+  abort "#{file_ext} format not supported" unless file_ext.match(/^(json|xml)$/)
+  # CveServer just  support for NVD reports XML version 2.0 and JSON version 1.0
+  version = (file_ext == 'json') ? '1.0' : '2.0'
+  link_pattern = /nvdcve-#{version}-(modified|recent|\d{4}).#{file_ext}.gz$/
 
-if response.is_a?(Net::HTTPSuccess)
-  @doc = Nokogiri::HTML(response.body)
-  xml_file_path = '//table[@data-testid="vuln-feed-table"]/tbody' \
-                  '/tr[@data-testid="vuln-xml-feed-row-recent-gzip" ' \
-                  'or @data-testid="vuln-xml-feed-row-modified-gzip"]' \
-                  '/td[@class="xml-file-type file-20"]/a[text()]/@href'
-  @doc.xpath('//html').xpath(xml_file_path).each do |href|
-    link = href.value
-    # CveServer just include support for NVD reports version 2.0
-    next unless link =~ /nvdcve-2.0-(modified|recent|\d{4}).xml.gz$/
+  data_url = 'https://nvd.nist.gov/vuln/data-feeds'
+  response = fetch_page(data_url)
 
-    dest_path = dest_path(link)
-    downloaded_path = [dest_path, '.download'].join
+  if response.is_a?(Net::HTTPSuccess)
+    @doc = Nokogiri::HTML(response.body)
+    xml_file_path = '//table[@data-testid="vuln-feed-table"]/tbody' \
+                    '/tr[@class="xml-feed-data-row"]' \
+                    '/td[@class="xml-file-type file-20"]/a[text()]/@href'
+    @doc.xpath('//html').xpath(xml_file_path).each do |href|
+      link = href.value
+      next unless link =~ link_pattern
 
-    puts "Downloading file from #{link}.."
-    download_file(link, downloaded_path)
+      dest_path = dest_path(link)
+      downloaded_path = [dest_path, '.download'].join
 
-    if File.exist?(downloaded_path) && File.size?(downloaded_path)
-      File.delete(dest_path) if File.exist?(dest_path)
-      File.rename(downloaded_path, dest_path)
+      puts "Downloading file from #{link}.."
+      download_file(link, downloaded_path)
+
+      if File.exist?(downloaded_path) && File.size?(downloaded_path)
+        File.delete(dest_path) if File.exist?(dest_path)
+        File.rename(downloaded_path, dest_path)
+      end
     end
   end
 end
+
+usage = 'Usage: nvd_downloader [options]'
+options = { file_ext: 'xml' }
+OptionParser.new do |opts|
+  opts.banner = usage
+
+  # Mandatory argument.
+  opts.on("-f", "--file_extension json or xml", "Specify the file extension (json or xml) to be downloaded from NVD") do |file_ext|
+    options[:file_ext] = file_ext || 'json'
+  end
+
+  opts.on_tail("-h", "--help", "Show this message") do
+    puts opts
+    exit
+  end
+end.parse!
+
+download_reports(options[:file_ext])
