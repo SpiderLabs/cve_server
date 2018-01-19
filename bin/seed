@@ -3,8 +3,26 @@ $LOAD_PATH.unshift File.expand_path(File.join('..', '..', '/lib'), __FILE__)
 require 'zlib'
 require 'cve_server'
 require 'cve_server/nvd/reader'
+require 'cve_server/nvd/json/reader'
+require 'optparse'
 
-files = File.join(CVEServer::Boot.config.raw_data_path, '*.xml.gz')
+usage = 'Usage: seed [options]'
+options = { file_ext: 'xml' }
+OptionParser.new do |opts|
+  opts.banner = usage
+
+  # Mandatory argument.
+  opts.on("-f", "--file_extension json or xml", "Specify the file extension (json or xml) to be downloaded from NVD") do |file_ext|
+    options[:file_ext] = file_ext || 'json'
+  end
+
+  opts.on_tail("-h", "--help", "Show this message") do
+    puts opts
+    exit
+  end
+end.parse!
+
+files = File.join(CVEServer::Boot.config.raw_data_path, "*.#{options[:file_ext]}.gz")
 
 CVEServer::Cve.drop_all
 CVEServer::Cpe.drop_all
@@ -13,7 +31,11 @@ CVEServer::CpeWithVersion.drop_all
 Dir.glob(files).sort.each do |infile|
   puts "Uncompressing #{infile}"
   input = Zlib::GzipReader.open(infile).read
-  @doc = CVEServer::NVD::Reader.new(input)
+  if options[:file_ext] == 'json'
+    @doc = CVEServer::NVD::JSON::Reader.new(input)
+  else
+    @doc = CVEServer::NVD::Reader.new(input)
+  end
   puts 'Exporting data into the CVE collection'
   CVEServer::Cve.bulk_create(@doc.all_cve)
 end
