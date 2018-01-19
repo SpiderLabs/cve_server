@@ -104,7 +104,13 @@ module CVEServer
         def full_cpes
           nodes = attribute('configurations', 'nodes') || []
           nodes.collect do |e|
-            e['cpe'].collect { |cpe| cpe['cpeMatchString'] } unless e['cpe'].nil?
+            e['cpe'].collect { |cpe|
+              if cpe.key?('cpeMatchString')
+                cpe['cpeMatchString']
+              else
+                cpe['cpe22Uri']
+              end
+            } unless e['cpe'].nil?
           end.compact.flatten
         end
       end
