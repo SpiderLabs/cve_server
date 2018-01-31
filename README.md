@@ -67,7 +67,7 @@ curl --ssl -s https://raw.githubusercontent.com/SpiderLabs/cve_server/master/scr
 
     or
 
-    ./bin/nvd_downloader -f bson
+    ./bin/nvd_downloader -f json
 
   4. Configure your database.
 
@@ -79,9 +79,9 @@ curl --ssl -s https://raw.githubusercontent.com/SpiderLabs/cve_server/master/scr
 
     or
 
-    RACK_ENV=development ./bin/seed -f bson
+    RACK_ENV=development ./bin/seed -f json
 
-  This will populate the database using the experimental JSON reports from NVD and it renames the `score` key to `base_score` in the `cvss` (v2) field, it also includes the `cvssv3` information and some changes for  the links in the `references` field.
+  The -json flag will populate the database using the experimental JSON reports from NVD and it renames the `score` key to `base_score` in the `cvss` (v2) field, it also includes the `cvssv3` information and some changes for  the links in the `references` field.
 
   6. Start the server.
 
