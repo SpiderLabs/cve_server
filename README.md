@@ -81,7 +81,7 @@ curl --ssl -s https://raw.githubusercontent.com/SpiderLabs/cve_server/master/scr
 
     RACK_ENV=development ./bin/seed -f json
 
-  The -f flag with json option will populate the database using the experimental JSON reports from NVD and it renames the `score` key to `base_score` in the `cvss` (v2) field, it also includes the `cvssv3` information and some changes for  the links in the `references` field.
+  The `-f` flag with the `json` option will populate the database using the experimental JSON reports from NVD and it renames the `score` key to `base_score` in the `cvss` (v2) field, it also includes the `cvssv3` information and some changes for  the links in the `references` field.
 
   6. Start the server.
 
