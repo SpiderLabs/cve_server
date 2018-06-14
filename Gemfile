@@ -14,8 +14,8 @@ group :production do
 end
 
 group :development, :test do
-  gem 'pry', '~> 0.10.4'
-  gem 'rspec', '~> 3.6.0'
-  gem 'rack-test', '~> 0.7'
-  gem 'simplecov', '~> 0.15.0', :require => false
+  gem 'pry', '~> 0.11.3'
+  gem 'rspec', '~> 3.7.0'
+  gem 'rack-test', '~> 1.0.0'
+  gem 'simplecov', '~> 0.16.1', :require => false
 end
