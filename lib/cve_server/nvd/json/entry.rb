@@ -115,7 +115,10 @@ module CVEServer
           nodes.collect do |e|
             cpe_match = e.fetch('cpe_match', [])
             next if cpe_match.empty?
-            cpe_match.map { |cpe| cpe.dig('cpe22Uri') || cpe.dig('cpe23Uri') }
+            cpe_match.map do |cpe|
+              str = cpe['cpe22Uri'] if cpe.has_key?('cpe22Uri')
+              str ||= cpe['cpe23Uri'] if cpe.has_key?('cpe23Uri')
+            end
           end.compact.flatten
         end
       end
