@@ -86,7 +86,7 @@ describe CVEServer::NVD::JSON::Entry do
           :privileges_required => "NONE",
           :scope => "UNCHANGED",
           :user_interaction => "NONE",
-          :vector => "AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H",
+          :vector => "CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H",
         }
         expect(subject.cvssv3).not_to be_nil
         expect(subject.cvssv3).to eq(expected_cvssv3)

@@ -59,6 +59,7 @@ module CVEServer
             cvss = base_metric['cvssV2'] || {}
             v2 = cvss.each_with_object({}) { |e, h| h[normalize_key(e[0])] = e[1] }
             v2.delete('vector_string')
+            v2.delete('version')
             CVEServer::NVD::Cvss.new(v2).to_hash
           end
         end
@@ -69,6 +70,7 @@ module CVEServer
             cvss = base_metric['cvssV3'] || {}
             v3 = cvss.each_with_object({}) { |e, h| h[normalize_key(e[0]).to_sym] = e[1] }
             v3[:vector] = v3.delete(:vector_string) if v3.key?(:vector_string)
+            v3.delete(:version)
             v3
           end
         end
@@ -85,7 +87,14 @@ module CVEServer
         end
 
         def cpes_with_version
-          full_cpes.map { |cpe| cpe.gsub(/^cpe:\/\w:/, '') }.uniq
+          cpe_regex = /^cpe:(?:2\.[23]:)?[aho]:(?<vendor>[^:]+):(?<product>[^:]+):(?<version>[^:]+)/
+          full_cpes.map do |cpe|
+            if match = cpe.match(cpe_regex)
+              cpe_parts = [match[:vendor], match[:product]]
+              cpe_parts << match[:version] unless match[:version] == '*'
+              cpe_parts.join(':')
+            end
+          end
         end
 
         private
@@ -104,13 +113,12 @@ module CVEServer
         def full_cpes
           nodes = attribute('configurations', 'nodes') || []
           nodes.collect do |e|
-            e['cpe'].collect { |cpe|
-              if cpe.key?('cpeMatchString')
-                cpe['cpeMatchString']
-              else
-                cpe['cpe22Uri']
-              end
-            } unless e['cpe'].nil?
+            cpe_match = e.fetch('cpe_match', [])
+            next if cpe_match.empty?
+            cpe_match.map do |cpe|
+              str = cpe['cpe22Uri'] if cpe.has_key?('cpe22Uri')
+              str ||= cpe['cpe23Uri'] if cpe.has_key?('cpe23Uri')
+            end
           end.compact.flatten
         end
       end
