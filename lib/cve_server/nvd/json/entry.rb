@@ -7,7 +7,6 @@ module CVEServer
       class Entry
         def initialize(entry)
           @entry = entry
-          @cpe_regex = /^cpe:(?:2\.[23]:)?[aho]:(?<vendor>[^:]+):(?<product>[^:]+):(?<version>[^:]+)/
         end
 
         def to_hash
@@ -88,8 +87,9 @@ module CVEServer
         end
 
         def cpes_with_version
+          cpe_regex = /^cpe:(?:2\.[23]:)?[aho]:(?<vendor>[^:]+):(?<product>[^:]+):(?<version>[^:]+)/
           full_cpes.map do |cpe|
-            if match = cpe.match(@cpe_regex)
+            if match = cpe.match(cpe_regex)
               cpe_parts = [match[:vendor], match[:product]]
               cpe_parts << match[:version] unless match[:version] == '*'
               cpe_parts.join(':')
