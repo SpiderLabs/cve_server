@@ -64,7 +64,7 @@ namespace :deploy do
     on fetch(:bundle_servers) do
       within release_path do
         with fetch(:bundle_env_variables, {}) do
-          execute :bundle, 'exec', "./bin/seed RACK_ENV=#{fetch(:rack_env,{})}"
+          execute :bundle, 'exec', "./bin/seed RACK_ENV=#{fetch(:rack_env,{})} -f json"
         end
       end
     end
