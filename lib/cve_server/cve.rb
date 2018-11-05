@@ -19,7 +19,7 @@ module CVEServer
     end
 
     def self.all_cpe_equal(cpe)
-      all(cpes: /^#{cpe}$/i).collect do |h|
+      all(cpes: /^#{Regexp.escape(cpe)}$/i).collect do |h|
         h['id']
       end.uniq.sort
     end
@@ -31,7 +31,7 @@ module CVEServer
     end
 
     def self.all_cpe_with_version_equal(cpe)
-      all(cpes_with_version: /^#{cpe}$/i).collect do |h|
+      all(cpes_with_version: /^#{Regexp.escape(cpe)}$/i).collect do |h|
         h['id']
       end.uniq.sort
     end

@@ -23,6 +23,7 @@ module CVEServer
     end
 
     get '/v1/cpe/:cpe_str' do |cpe_str|
+      cpe_str = URI.decode(cpe_str) if params.dig('double_encoded_fields')
       # Multiple cpes were included
       if cpe_str.include?(",")
         bad_request unless valid_cpes?(cpe_str)
@@ -43,6 +44,7 @@ module CVEServer
     end
 
     get '/v1/cpe_with_version/:cpe_str' do |cpe_str|
+      cpe_str = URI.decode(cpe_str) if params.dig('double_encoded_fields')
       # Multiple cpes were included
       if cpe_str.include?(",")
         bad_request unless valid_cpes_with_version?(cpe_str)
