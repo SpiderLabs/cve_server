@@ -31,6 +31,14 @@ module CVEServer
       end
     end
 
+    def cpe_exceptions
+      begin
+        YAML.load_file(File.join(root, 'config', 'cpe_exceptions.yml')) || []
+      rescue Errno::ENOENT
+        []
+      end
+    end
+
     private
 
     def db_settings
