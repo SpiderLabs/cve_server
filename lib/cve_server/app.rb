@@ -24,7 +24,7 @@ module CVEServer
 
     get '/v1/cpe/:cpe_str' do |cpe_str|
       if params.has_key?('double_encoded_fields') && params['double_encoded_fields']
-        cpe_str = URI.decode(cpe_str)
+        cpe_str = URI.decode(URI.decode(cpe_str))
       end
       # Multiple cpes were included
       if cpe_str.include?(",")
@@ -47,7 +47,7 @@ module CVEServer
 
     get '/v1/cpe_with_version/:cpe_str' do |cpe_str|
       if params.has_key?('double_encoded_fields') && params['double_encoded_fields']
-        cpe_str = URI.decode(cpe_str)
+        cpe_str = URI.decode(URI.decode(cpe_str))
       end
       # Multiple cpes were included
       if cpe_str.include?(",")
