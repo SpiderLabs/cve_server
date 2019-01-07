@@ -23,6 +23,9 @@ matrix:
   - rvm: 2.5.0
     env:
       - LABEL=unit_tests
+  - rvm: 2.6.0
+    env:
+      - LABEL=unit_tests
 
 before_install:
   - gem update --system
