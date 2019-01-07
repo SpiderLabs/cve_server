@@ -2,16 +2,10 @@ language: ruby
 
 matrix:
   include:
-  - rvm: 2.2.6
-    env:
-      - LABEL=unit_tests
   - rvm: 2.3.0
     env:
       - LABEL=unit_tests
   - rvm: 2.4.1
-    env:
-      - LABEL=unit_tests
-  - rvm: 2.2.9
     env:
       - LABEL=unit_tests
   - rvm: 2.3.6
