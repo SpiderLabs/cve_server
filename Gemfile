@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 gem 'sinatra', '~> 2.0.3'
 gem 'sinatra-contrib', '~> 2.0.3'
-gem 'nokogiri', '~> 1.8.2'
+gem 'nokogiri', '~> 1.8.5'
 gem 'mongo', '~> 2.1.2'
 gem 'puma', '~> 3.11.4'
 
