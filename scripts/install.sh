@@ -119,8 +119,8 @@ server {
   server_name localhost;
   location / {
     proxy_pass http://cve_server;
-    proxy_set_header Host $host;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host \$host;
+    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     proxy_buffering off;
   }
 }
