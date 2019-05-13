@@ -118,7 +118,6 @@ describe CVEServer::NVD::JSON::Entry do
           "microsoft:windows_server_2016"
         ]
         cpes = subject.cpes
-        puts cpes
         expect(subject.cpes).not_to be_nil
         expect(subject.cpes).to eq(expected_cpes)
       end
@@ -136,7 +135,6 @@ describe CVEServer::NVD::JSON::Entry do
           "microsoft:windows_server_2016"
         ]
         cpes = subject.cpes
-        puts cpes
         expect(subject.cpes_with_version).not_to be_nil
         expect(subject.cpes_with_version).to eq(expected_cpes)
       end
