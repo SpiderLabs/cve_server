@@ -85,34 +85,50 @@ module CVEServer
         end
 
         def cpes_with_version
-          full_cpes.map { |cpe| cpe.gsub(/^cpe:\/\w:/, '') }.uniq
+          full_cpes.map do |cpe|
+            cpe.gsub(/^cpe:(\/|\d.\d:)[\w]:/, '')
+              .split(':')[0..2]
+              .join(':')
+              .gsub(/(:\*)+$/, '')
+          end.uniq
         end
 
         private
-        def attribute(node, attr)
-          @entry[node][attr] if @entry.key?(node) && @entry[node].key?(attr)
-        end
 
-        def time_at(attr)
-          Time.parse(@entry[attr]) if @entry.key?(attr)
-        end
+          def attribute(node, attr)
+            @entry[node][attr] if @entry.key?(node) && @entry[node].key?(attr)
+          end
 
-        def normalize_key(key)
-          key.sub(/[A-Z]/) { |chr| '_' + chr.downcase }
-        end
+          def time_at(attr)
+            Time.parse(@entry[attr]) if @entry.key?(attr)
+          end
 
-        def full_cpes
-          nodes = attribute('configurations', 'nodes') || []
-          nodes.collect do |e|
-            e['cpe'].collect { |cpe|
-              if cpe.key?('cpeMatchString')
-                cpe['cpeMatchString']
-              else
-                cpe['cpe22Uri']
+          def normalize_key(key)
+            key.sub(/[A-Z]/) { |chr| '_' + chr.downcase }
+          end
+
+          # Extracts CPEs that may be deeply nested
+          # @param [Array]  children Nested CPE nodes
+          # @return [Array<String>] Full CPEs
+          def nested_cpes(children)
+            cpes = []
+            children.each do |child|
+              if child.has_key?('cpe_match')
+                child['cpe_match'].each do |cpe_match|
+                  cpes << cpe_match['cpe23Uri'] if cpe_match.has_key?('cpe23Uri')
+                  cpes << cpe_match['cpe22Uri'] if cpe_match.has_key?('cpe22Uri')
+                end
+              elsif child.has_key?('children')
+                cpes.push *nested_cpes(child['children']).flatten
               end
-            } unless e['cpe'].nil?
-          end.compact.flatten
-        end
+            end
+            cpes
+          end
+
+          def full_cpes
+            nodes = attribute('configurations', 'nodes') || []
+            nested_cpes(nodes)
+          end
       end
     end
   end

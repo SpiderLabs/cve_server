@@ -59,6 +59,7 @@ describe CVEServer::NVD::JSON::Entry do
     describe '#cvssv2' do
       it 'should return the cvss version 2' do
         expected_cvssv2 = {
+          :version => "2.0",
           :access_complexity => "MEDIUM",
           :access_vector => "NETWORK",
           :authentication => "NONE",
@@ -76,6 +77,7 @@ describe CVEServer::NVD::JSON::Entry do
     describe '#cvssv3' do
       it 'should return the cvss version 3' do
         expected_cvssv3 = {
+          :version => "3.0",
           :attack_complexity => "HIGH",
           :attack_vector => "NETWORK",
           :availability_impact => "HIGH",
@@ -86,7 +88,7 @@ describe CVEServer::NVD::JSON::Entry do
           :privileges_required => "NONE",
           :scope => "UNCHANGED",
           :user_interaction => "NONE",
-          :vector => "AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H",
+          :vector => "CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H",
         }
         expect(subject.cvssv3).not_to be_nil
         expect(subject.cvssv3).to eq(expected_cvssv3)
@@ -115,6 +117,8 @@ describe CVEServer::NVD::JSON::Entry do
           "microsoft:windows_server_2012",
           "microsoft:windows_server_2016"
         ]
+        cpes = subject.cpes
+        puts cpes
         expect(subject.cpes).not_to be_nil
         expect(subject.cpes).to eq(expected_cpes)
       end
@@ -131,6 +135,8 @@ describe CVEServer::NVD::JSON::Entry do
           "microsoft:windows_server_2012:r2",
           "microsoft:windows_server_2016"
         ]
+        cpes = subject.cpes
+        puts cpes
         expect(subject.cpes_with_version).not_to be_nil
         expect(subject.cpes_with_version).to eq(expected_cpes)
       end
@@ -204,6 +210,63 @@ describe CVEServer::NVD::JSON::Entry do
             expect(subject.send(:full_cpes)).to be_empty
           end
         end
+      end
+    end
+  end
+
+  context 'when a CPE configuration node has children' do
+    let(:infile) {
+      json_file = '../../../../fixtures/nvd_data/partial-nvdcve-1.0-CVE-2019-1694.json.gz'
+      File.expand_path(json_file, __FILE__)
+    }
+    let(:input) { Zlib::GzipReader.open(infile).read }
+    let(:json) { JSON.parse(input) }
+    let(:entry) { json['CVE_Items'].last }
+    subject { described_class.new(entry) }
+
+    describe '#cpes' do
+      it 'should return all CPEs' do
+        expected_cpes = [
+          "cisco:adaptive_security_appliance_software",
+          "cisco:asa_5505",
+          "cisco:asa_5510",
+          "cisco:asa_5512-x",
+          "cisco:asa_5515-x",
+          "cisco:asa_5520",
+          "cisco:asa_5525-x",
+          "cisco:asa_5540",
+          "cisco:asa_5545-x",
+          "cisco:asa_5550",
+          "cisco:asa_5555-x",
+          "cisco:asa_5580",
+          "cisco:asa_5585-x",
+          "cisco:firepower_threat_defense"
+        ]
+        expect(subject.cpes).not_to be_nil
+        expect(subject.cpes).to eq(expected_cpes)
+      end
+    end
+
+    describe '#cpes_with_version' do
+      it 'should return all CPEs with versions' do
+        expected_cpes = [
+          "cisco:adaptive_security_appliance_software",
+          "cisco:asa_5505:-",
+          "cisco:asa_5510:-",
+          "cisco:asa_5512-x:-",
+          "cisco:asa_5515-x:-",
+          "cisco:asa_5520:-",
+          "cisco:asa_5525-x:-",
+          "cisco:asa_5540:-",
+          "cisco:asa_5545-x:-",
+          "cisco:asa_5550:-",
+          "cisco:asa_5555-x:-",
+          "cisco:asa_5580:-",
+          "cisco:asa_5585-x:-",
+          "cisco:firepower_threat_defense"
+        ]
+        expect(subject.cpes_with_version).not_to be_nil
+        expect(subject.cpes_with_version).to eq(expected_cpes)
       end
     end
   end
