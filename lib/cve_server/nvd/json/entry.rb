@@ -87,17 +87,18 @@ module CVEServer
         end
 
         def cpes_with_version
-          cpe_regex = /^cpe:(?:2\.[23]:)?[aho]:(?<vendor>[^:]+):(?<product>[^:]+):(?<version>[^:]+)/
+          cpe_regex = /^cpe:(?:\/|2\.[23]:)[aho]:(?<vendor>[^:]+):(?<product>[^:]+):(?<version>[^:]+)/
           full_cpes.map do |cpe|
             if match = cpe.match(cpe_regex)
               cpe_parts = [match[:vendor], match[:product]]
               cpe_parts << match[:version] unless match[:version] == '*'
               cpe_parts.join(':')
             end
-          end
+          end.uniq
         end
 
         private
+
         def attribute(node, attr)
           @entry[node][attr] if @entry.key?(node) && @entry[node].key?(attr)
         end
@@ -110,16 +111,27 @@ module CVEServer
           key.sub(/[A-Z]/) { |chr| '_' + chr.downcase }
         end
 
+        # Extracts CPEs that may be deeply nested
+        # @param [Array]  children Nested CPE nodes
+        # @return [Array<String>] Full CPEs
+        def nested_cpes(children)
+          cpes = []
+          children.each do |child|
+            if child.has_key?('cpe_match')
+              child['cpe_match'].each do |cpe_match|
+                cpes << cpe_match['cpe23Uri'] if cpe_match.has_key?('cpe23Uri')
+                cpes << cpe_match['cpe22Uri'] if cpe_match.has_key?('cpe22Uri')
+              end
+            elsif child.has_key?('children')
+              cpes.push *nested_cpes(child['children']).flatten
+            end
+          end
+          cpes
+        end
+
         def full_cpes
           nodes = attribute('configurations', 'nodes') || []
-          nodes.collect do |e|
-            cpe_match = e.fetch('cpe_match', [])
-            next if cpe_match.empty?
-            cpe_match.map do |cpe|
-              str = cpe['cpe22Uri'] if cpe.has_key?('cpe22Uri')
-              str ||= cpe['cpe23Uri'] if cpe.has_key?('cpe23Uri')
-            end
-          end.compact.flatten
+          nested_cpes(nodes)
         end
       end
     end

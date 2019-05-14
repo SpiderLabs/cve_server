@@ -3,99 +3,122 @@ $LOAD_PATH.unshift File.expand_path(File.join('..', '..', '/lib'), __FILE__)
 require 'nokogiri'
 require 'net/http'
 require 'optparse'
+require 'ostruct'
 require 'cve_server'
 
-def fetch_page(url)
-  uri = URI.parse(url)
-  use_ssl = uri.scheme == 'https'
-  Net::HTTP.start(uri.host, uri.port, use_ssl: use_ssl) do |http|
-    response = http.request_get(uri)
-    case response
-    when Net::HTTPSuccess then
-      response
-    when Net::HTTPRedirection then
-      location = response['location']
-      fail "redirected to #{location}"
-    else
-      response.value
-    end
-  end
-end
+class NvdDownloader
+  NVD_FEED_TYPE = %i{json xml}
+  NVD_FEED_NAMES = %w{modified recent}.push(*2002..Time.new.year).map(&:to_s)
 
-def download_file(url, dest_path)
-  uri = URI.parse(url)
-  use_ssl = uri.scheme == 'https'
-  Net::HTTP.start(uri.host, uri.port, use_ssl: use_ssl) do |http|
-    http.request_get(uri.path) do |response|
-      case response
-      when Net::HTTPSuccess then
-        f = File.open(dest_path, 'w')
-        response.read_body do |seg|
-          f << seg
-          sleep 0.005
+  def initialize(nvd_feed_type:, nvd_feed_names:)
+    abort "#{nvd_feed_type} format not supported" unless NVD_FEED_TYPE.include? nvd_feed_type
+    abort "Invalid NVD feed names provided: [#{nvd_feed_names.join(',')}]" if (NVD_FEED_NAMES & nvd_feed_names).empty?
+    @nvd_feed_type = nvd_feed_type
+    @nvd_feed_names = nvd_feed_names
+    # CveServer supports only XML schema version 2.0 and JSON schema version 1.0 NVD Data Feeds
+    @schema_version = (@nvd_feed_type == :json) ? '1.0' : '2.0'
+  end
+
+  # @param [Array<String>]  args
+  # @return [Hash{Symbol => Symbol}]
+  def self.parse(args)
+    options = OpenStruct.new
+    options.nvd_feed_type = :json
+    options.nvd_feed_names = NVD_FEED_NAMES
+
+    opt_parser = OptionParser.new do |opts|
+      opts.banner = 'Usage: nvd_downloader [options]'
+      options
+
+      opts.on("-f", "--feed_type TYPE", NVD_FEED_TYPE,
+              "Specify the NVD source feed type to downloaded (#{NVD_FEED_TYPE.join(',')})") do |nvd_feed_type|
+        options.nvd_feed_type = nvd_feed_type
+      end
+
+      opts.on("-n" "--nvd_feed_names [2018,modified]", Array, "Specify a list of NVD feeds to download (#{NVD_FEED_NAMES.join(',')})") do |feed_names|
+        sanitized = NVD_FEED_NAMES & feed_names.map(&:downcase)
+        options.nvd_feed_names = sanitized unless sanitized.empty?
+      end
+
+      opts.on_tail("-h", "--help", "Show this message") do
+        puts opts
+        exit
+      end
+    end
+
+    opt_parser.parse!(args)
+    options.to_h
+  end
+
+  def download(url)
+    uri = URI.parse(url)
+    use_ssl = uri.scheme == 'https'
+    Net::HTTP.start(uri.host, uri.port, use_ssl: use_ssl) do |http|
+      http.request_get(uri.path) do |response|
+        case response
+        when Net::HTTPSuccess then
+          return response.body
+        when Net::HTTPRedirection then
+          location = response['location']
+          fail "redirected to #{location}"
+        else
+          fail "Unable to download #{url}"
         end
-        f.close
-      when Net::HTTPRedirection then
-        location = response['location']
-        fail "redirected to #{location}"
-      else
-        fail "Unable to download #{url}"
       end
+    end
+  end
+
+  def dest_path(url)
+    filename = File.basename(url)
+    File.join(CVEServer::Boot.config.raw_data_path, filename)
+  end
+
+  def last_modified_date(meta_content)
+    match = meta_content.match(/(?:lastModifiedDate:)(?<date>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}-\d{2}:\d{2})/)
+    abort "Missing last modified date from meta file" unless match.is_a? MatchData
+    DateTime.parse(match[:date])
+  end
+
+  def gz_to_download
+    @nvd_feed_names.map do |nvd_feed_name|
+      base = "https://nvd.nist.gov/feeds/#{@nvd_feed_type}/cve/#{@schema_version}/nvdcve-#{@schema_version}-#{nvd_feed_name}"
+      meta_url = "#{base}.meta"
+      local_meta_file = dest_path(meta_url)
+      gz_url = "#{base}.#{@nvd_feed_type}.gz"
+
+      # If the metadata file doesn't exist, download it and add the gzip to the pending feed download list
+      downloaded_meta_content = self.download(meta_url)
+      unless File.exists?(local_meta_file)
+        File.write(local_meta_file, downloaded_meta_content)
+      end
+
+      downloaded_mod_date = last_modified_date(downloaded_meta_content)
+      local_mod_date = last_modified_date(File.read(local_meta_file))
+      local_gz = dest_path(gz_url)
+      if downloaded_mod_date > local_mod_date || !File.exists?(local_gz)
+        File.delete(local_gz) if File.exists?(local_gz)
+        File.write(local_meta_file, downloaded_meta_content)
+        next gz_url
+      end
+
+      local_extracted = dest_path("#{base}.#{@nvd_feed_type}")
+      puts "#{File.basename(local_extracted)} is up-to-date, skipping download."
+      next
+    end.compact
+  end
+
+  def download_feeds
+    gz_urls = gz_to_download
+    gz_urls.each_with_index do |url, i|
+      dest = dest_path(url)
+      puts "Downloading #{i+1} of #{gz_urls.length}: #{dest}"
+      content = download(url)
+      File.write(dest, content)
     end
   end
 end
 
-def dest_path(link)
-  filename = link.split('/').last
-  File.join(CVEServer::Boot.config.raw_data_path, filename)
-end
 
-def download_reports(file_ext)
-  abort "#{file_ext} format not supported" unless file_ext.match(/^(json|xml)$/)
-  # CveServer just  support for NVD reports XML version 2.0 and JSON version 1.0
-  version = (file_ext == 'json') ? '1.0' : '2.0'
-  link_pattern = /nvdcve-#{version}-(modified|recent|\d{4}).#{file_ext}.gz$/
-
-  data_url = 'https://nvd.nist.gov/vuln/data-feeds'
-  response = fetch_page(data_url)
-
-  if response.is_a?(Net::HTTPSuccess)
-    @doc = Nokogiri::HTML(response.body)
-    xml_file_path = '//table[@data-testid="vuln-feed-table"]/tbody' \
-                    '/tr[@class="xml-feed-data-row"]' \
-                    '/td[@class="xml-file-type file-20"]/a[text()]/@href'
-    @doc.xpath('//html').xpath(xml_file_path).each do |href|
-      link = href.value
-      next unless link =~ link_pattern
-
-      dest_path = dest_path(link)
-      downloaded_path = [dest_path, '.download'].join
-
-      puts "Downloading file from #{link}.."
-      download_file(link, downloaded_path)
-
-      if File.exist?(downloaded_path) && File.size?(downloaded_path)
-        File.delete(dest_path) if File.exist?(dest_path)
-        File.rename(downloaded_path, dest_path)
-      end
-    end
-  end
-end
-
-usage = 'Usage: nvd_downloader [options]'
-options = { file_ext: 'xml' }
-OptionParser.new do |opts|
-  opts.banner = usage
-
-  # Mandatory argument.
-  opts.on("-f", "--file_extension json or xml", "Specify the file extension (json or xml) to be downloaded from NVD") do |file_ext|
-    options[:file_ext] = file_ext || 'json'
-  end
-
-  opts.on_tail("-h", "--help", "Show this message") do
-    puts opts
-    exit
-  end
-end.parse!
-
-download_reports(options[:file_ext])
+options = NvdDownloader.parse(ARGV)
+nvd_downloader = NvdDownloader.new(options)
+nvd_downloader.download_feeds

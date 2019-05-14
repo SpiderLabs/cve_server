@@ -207,4 +207,61 @@ describe CVEServer::NVD::JSON::Entry do
       end
     end
   end
+
+  context 'when a CPE configuration node has children' do
+    let(:infile) {
+      json_file = '../../../../fixtures/nvd_data/partial-nvdcve-1.0-CVE-2019-1694.json.gz'
+      File.expand_path(json_file, __FILE__)
+    }
+    let(:input) { Zlib::GzipReader.open(infile).read }
+    let(:json) { JSON.parse(input) }
+    let(:entry) { json['CVE_Items'].last }
+    subject { described_class.new(entry) }
+
+    describe '#cpes' do
+      it 'should return all CPEs' do
+        expected_cpes = [
+          "cisco:adaptive_security_appliance_software",
+          "cisco:asa_5505",
+          "cisco:asa_5510",
+          "cisco:asa_5512-x",
+          "cisco:asa_5515-x",
+          "cisco:asa_5520",
+          "cisco:asa_5525-x",
+          "cisco:asa_5540",
+          "cisco:asa_5545-x",
+          "cisco:asa_5550",
+          "cisco:asa_5555-x",
+          "cisco:asa_5580",
+          "cisco:asa_5585-x",
+          "cisco:firepower_threat_defense"
+        ]
+        expect(subject.cpes).not_to be_nil
+        expect(subject.cpes).to eq(expected_cpes)
+      end
+    end
+
+    describe '#cpes_with_version' do
+      it 'should return all CPEs with versions' do
+        expected_cpes = [
+          "cisco:adaptive_security_appliance_software",
+          "cisco:asa_5505:-",
+          "cisco:asa_5510:-",
+          "cisco:asa_5512-x:-",
+          "cisco:asa_5515-x:-",
+          "cisco:asa_5520:-",
+          "cisco:asa_5525-x:-",
+          "cisco:asa_5540:-",
+          "cisco:asa_5545-x:-",
+          "cisco:asa_5550:-",
+          "cisco:asa_5555-x:-",
+          "cisco:asa_5580:-",
+          "cisco:asa_5585-x:-",
+          "cisco:firepower_threat_defense"
+        ]
+        expect(subject.cpes_with_version).not_to be_nil
+        expect(subject.cpes_with_version).to eq(expected_cpes)
+      end
+    end
+  end
 end
