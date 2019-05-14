@@ -1,6 +1,6 @@
-lock '3.4.0'
+lock '3.9.1'
 set :application, 'cve_server'
-set :repo_url, 'git@github.com:SpiderLabs/cve_server.git'
+set :repo_url, 'https://github.com/SpiderLabs/cve_server.git'
 set :branch, 'master' # Default branch is :master
 set :deploy_to, '/home/deployer/cve_server'
 set :stage, :production
@@ -53,7 +53,7 @@ namespace :deploy do
     on fetch(:bundle_servers) do
       within release_path do
         with fetch(:bundle_env_variables, {}) do
-          execute :bundle, 'exec', './bin/nvd_downloader'
+          execute :bundle, 'exec', './bin/nvd_downloader -f json'
         end
       end
     end
@@ -64,7 +64,7 @@ namespace :deploy do
     on fetch(:bundle_servers) do
       within release_path do
         with fetch(:bundle_env_variables, {}) do
-          execute :bundle, 'exec', "./bin/seed RACK_ENV=#{fetch(:rack_env,{})}"
+          execute :bundle, 'exec', "./bin/seed RACK_ENV=#{fetch(:rack_env,{})} -f json"
         end
       end
     end

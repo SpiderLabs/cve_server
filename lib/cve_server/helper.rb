@@ -1,3 +1,5 @@
+require 'cve_server/config'
+
 module CVEServer
   module Helper
     module_function
@@ -8,6 +10,8 @@ module CVEServer
     end
 
     def valid_cpe?(cpe)
+      config = CVEServer::Config.new
+      return true if config.cpe_exceptions.include? cpe
       cpe.match(/^[a-z0-9_\%\~\.\-]+\:[a-z0-9_\%\~\.\-]+$/i)
     end
 

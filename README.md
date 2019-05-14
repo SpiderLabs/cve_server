@@ -5,7 +5,7 @@ Simple REST-style web service for the CVE searching.
 ## Requirements
 
   * [Ruby Version Manager](https://rvm.io)
-  * [Ruby 2.2.6 or later version](https://www.ruby-lang.org)
+  * [Ruby 2.3.x or later version](https://www.ruby-lang.org)
   * [Bundler](http://bundler.io)
   * [Mongo DB](https://www.mongodb.org)
 

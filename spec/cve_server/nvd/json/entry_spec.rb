@@ -59,7 +59,6 @@ describe CVEServer::NVD::JSON::Entry do
     describe '#cvssv2' do
       it 'should return the cvss version 2' do
         expected_cvssv2 = {
-          :version => "2.0",
           :access_complexity => "MEDIUM",
           :access_vector => "NETWORK",
           :authentication => "NONE",
@@ -77,7 +76,6 @@ describe CVEServer::NVD::JSON::Entry do
     describe '#cvssv3' do
       it 'should return the cvss version 3' do
         expected_cvssv3 = {
-          :version => "3.0",
           :attack_complexity => "HIGH",
           :attack_vector => "NETWORK",
           :availability_impact => "HIGH",
@@ -117,7 +115,6 @@ describe CVEServer::NVD::JSON::Entry do
           "microsoft:windows_server_2012",
           "microsoft:windows_server_2016"
         ]
-        cpes = subject.cpes
         expect(subject.cpes).not_to be_nil
         expect(subject.cpes).to eq(expected_cpes)
       end
@@ -134,7 +131,6 @@ describe CVEServer::NVD::JSON::Entry do
           "microsoft:windows_server_2012:r2",
           "microsoft:windows_server_2016"
         ]
-        cpes = subject.cpes
         expect(subject.cpes_with_version).not_to be_nil
         expect(subject.cpes_with_version).to eq(expected_cpes)
       end
