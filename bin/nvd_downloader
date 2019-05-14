@@ -5,7 +5,6 @@ require 'net/http'
 require 'optparse'
 require 'ostruct'
 require 'cve_server'
-require 'fileutils'
 
 class NvdDownloader
   NVD_FEED_TYPE = %i{json xml}
@@ -28,7 +27,7 @@ class NvdDownloader
     options.nvd_feed_names = NVD_FEED_NAMES
 
     opt_parser = OptionParser.new do |opts|
-      opts.banner = 'Usage: nvd_downloader.rb [options]'
+      opts.banner = 'Usage: nvd_downloader [options]'
       options
 
       opts.on("-f", "--feed_type TYPE", NVD_FEED_TYPE,
