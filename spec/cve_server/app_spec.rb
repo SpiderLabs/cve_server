@@ -158,7 +158,7 @@ describe CVEServer::App do
           "integrity_impact": "PARTIAL",
           "vector": "AV:N/AC:L/Au:N/C:P/I:P/A:P"
         },
-        "cvssv3": null,
+        "cvssv3": nil,
         "cwe": "CWE-119",
         "id": "CVE-2014-0001",
         "published_at": "2014-01-31 23:55:00 UTC",
