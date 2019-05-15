@@ -37,8 +37,8 @@ module CVEServer
                  unless cpes.is_a?(Array) or cpes.is_a?(String)
                    raise TypeError, "'cpes' must be an Array or String"
                  end
-                 [cpes].flatten.map(&:to_s).map do |cpe|
-                   all(cpes_affected: /^#{Regexp.escape(cpe)}$/i).collect do |h|
+                 [cpes].flatten.map do |cpe|
+                   all(cpes_affected: /^#{Regexp.escape(cpe.to_s)}$/i).collect do |h|
                      h['id']
                    end
                  end
