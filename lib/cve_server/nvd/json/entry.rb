@@ -19,6 +19,7 @@ module CVEServer
             cvss: cvssv2,
             cvssv3: cvssv3,
             references: references,
+            cpes_affected: cpes_affected,
             cpes: cpes,
             cpes_with_version: cpes_with_version
           }
@@ -80,6 +81,19 @@ module CVEServer
           if references.is_a?(Hash) && references.key?('reference_data')
             references['reference_data'].collect { |e| { href: e['url'] } }
           end
+        end
+
+        # Affected CPEs created using vendor and product name under the "affects" node
+        # @return [Array<String>]
+        def cpes_affected
+          vendor_data = @entry.dig('cve', 'affects', 'vendor', 'vendor_data') || []
+          vendor_data.map do |vendor_data_entry|
+            vendor_name = vendor_data_entry['vendor_name']
+            vendor_data_entry
+              .fetch('product', {})
+              .fetch('product_data', [])
+              .map {|product_data_entry| "#{vendor_name}:#{product_data_entry['product_name']}"}
+          end.flatten.uniq
         end
 
         def cpes

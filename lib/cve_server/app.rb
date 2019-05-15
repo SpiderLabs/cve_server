@@ -45,6 +45,28 @@ module CVEServer
       json_resp CVEServer::Cpe.all
     end
 
+    get '/v1/cpes_affected/:cpe_str' do |cpe_str|
+      cpe_str.downcase!
+
+      if params.has_key?('double_encoded_fields') && params['double_encoded_fields']
+        cpe_str = URI.decode(URI.decode(cpe_str))
+      end
+
+      bad_request unless valid_cpes?(cpe_str)
+
+      cpes = cpe_str.split(/\s*,\s*/)
+      cves = CVEServer::Cve.all_cpes_affected(cpes)
+      if cves.count > 0
+        json_resp cves
+      else
+        not_found
+      end
+    end
+
+    get '/v1/cpes_affected/?' do
+      json_resp CVEServer::Cve.all_cpes_affected
+    end
+
     get '/v1/cpe_with_version/:cpe_str' do |cpe_str|
       if params.has_key?('double_encoded_fields') && params['double_encoded_fields']
         cpe_str = URI.decode(URI.decode(cpe_str))
