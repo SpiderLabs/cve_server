@@ -46,9 +46,12 @@ module CVEServer
     end
 
     get '/v1/cpe_affected/:cpe_str' do |cpe_str|
+      cpe_str.downcase!
+
       if params.has_key?('double_encoded_fields') && params['double_encoded_fields']
         cpe_str = URI.decode(URI.decode(cpe_str))
       end
+
       # Multiple cpes were included
       if cpe_str.include?(",")
         bad_request unless valid_cpes?(cpe_str)
@@ -56,7 +59,7 @@ module CVEServer
         bad_request unless valid_cpes?(cpe_str)
       end
 
-      cves = CVEServer::Cve.all_cpes_affected(cpe_str.downcase)
+      cves = CVEServer::Cve.all_cpes_affected(cpe_str)
       if cves.count > 0
         json_resp cves
       else

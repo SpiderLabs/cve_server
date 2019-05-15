@@ -17,7 +17,7 @@ describe CVEServer::NVD::Entry do
   end
 
   it 'should have the CVE attributes' do
-    expect(@nvd_entry.to_hash.keys).to include(:id, :summary, :cwe, :published_at, :updated_at, :cvss, :references, :cpes)
+    expect(@nvd_entry.to_hash.keys).to include(:id, :summary, :cwe, :published_at, :updated_at, :cvss, :references, :cpes, :affected_cpes)
   end
 
   it 'should have the CVE ID CVE-2014-0001' do

@@ -136,6 +136,20 @@ describe CVEServer::NVD::JSON::Entry do
       end
     end
 
+    describe '#cpes_affected' do
+      it 'should return the affected cpes' do
+        expected_cpes =  [
+          "microsoft:windows_10",
+          "microsoft:windows_8.1",
+          "microsoft:windows_rt_8.1",
+          "microsoft:windows_server_2012",
+          "microsoft:windows_server_2016"
+        ]
+        expect(subject.cpes_affected).not_to be_nil
+        expect(subject.cpes_affected).to eq(expected_cpes)
+      end
+    end
+
     describe '#to_hash' do
       it 'should return an instance of Hash class' do
         expect(subject.to_hash).to be_instance_of(Hash)
