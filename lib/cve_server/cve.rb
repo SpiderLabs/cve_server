@@ -30,6 +30,14 @@ module CVEServer
       end.flatten.uniq.sort
     end
 
+    def self.all_cpes_affected(cpes)
+      cpes.split(/\s*,\s*/).map do |cpe|
+        all(cpes_affected: /^#{Regexp.escape(cpe)}$/i).collect do |h|
+          h['id']
+        end.uniq.sort
+      end.flatten.compact
+    end
+
     def self.all_cpe_with_version_equal(cpe)
       all(cpes_with_version: /^#{Regexp.escape(cpe)}$/i).collect do |h|
         h['id']
