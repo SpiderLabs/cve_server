@@ -24,8 +24,6 @@ shared_examples "good response results" do |url, expected_results|
     end
 
     it 'json response should match expected results' do
-      puts "json_response: #{json_response}"
-      puts "expected: #{expected_results}"
       expect(json_response).to eq expected_results
     end
 

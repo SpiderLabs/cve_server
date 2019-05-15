@@ -16,9 +16,7 @@ module CVEServer
 
       cve = CVEServer::Cve.find(cve.upcase)
       if cve
-        res = json_resp cve
-        puts res
-        res
+        json_resp cve
       else
         not_found
       end
