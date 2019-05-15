@@ -7,7 +7,7 @@ require 'cve_server/nvd/json/reader'
 require 'optparse'
 
 usage = 'Usage: seed [options]'
-options = { file_ext: 'xml' }
+options = { file_ext: 'json' }
 OptionParser.new do |opts|
   opts.banner = usage
 

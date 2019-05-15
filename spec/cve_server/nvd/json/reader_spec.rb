@@ -12,9 +12,9 @@ describe CVEServer::NVD::JSON::Reader do
     subject { described_class.new(input) }
     
     describe '#all_entries' do
-      it 'should return an array with 15 elements' do
+      it 'should return an array with 19 elements' do
         expect(subject.all_entries).to be_a(Array)
-        expect(subject.all_entries.size).to eq 15
+        expect(subject.all_entries.size).to eq 19
       end
     end
     
@@ -23,8 +23,8 @@ describe CVEServer::NVD::JSON::Reader do
         expect(subject.all_cve).to be_a(Array)
       end
       
-      it 'should return 15 entries for CVEs' do
-        expect(subject.all_cve.size).to eq 15
+      it 'should return 19 entries for CVEs' do
+        expect(subject.all_cve.size).to eq 19
       end
     end
     
