@@ -23,13 +23,13 @@ module CVEServer
     end
 
     get '/v1/cves/:cves' do |cves|
-      answer = []
+      entries = []
       elements = cves.split(',').uniq
       normalized_cves = elements.select {|e| e.match? (/^CVE-\d{4}-(0\d{3}|[1-9]\d{3,})$/) }.map(&:upcase)
       bad_request if normalized_cves.empty? || normalized_cves.size > 10
-      answer = CVEServer::Cve.all(id: { '$in': normalized_cves } )
-      not_found if answer.empty?
-      json_resp answer
+      entries = CVEServer::Cve.all(id: { '$in': normalized_cves } )
+      not_found if entries.empty?
+      json_resp entries
     end
 
     get '/v1/cpe/:cpe_str' do |cpe_str|
