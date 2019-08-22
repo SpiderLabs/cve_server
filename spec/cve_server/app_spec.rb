@@ -265,6 +265,208 @@ describe CVEServer::App do
     it_behaves_like "a good parameter handler", url, good_cves, unknown_good_cves, invalid_cves
   end
 
+  describe '/v1/cves/:cves' do
+    url = "/v1/cves/"
+    good_cves = {
+      "CVE-2014-0001" => [{
+        "id" => "CVE-2014-0001",
+        "summary" => "Buffer overflow in client/mysql.cc in Oracle MySQL and MariaDB before 5.5.35 allows remote database servers to cause a denial of service (crash) and possibly execute arbitrary code via a long server version string.",
+        "cwe" => "CWE-119",
+        "published_at" => "2014-01-31 23:55:00 UTC",
+        "updated_at" => "2019-04-22 17:48:00 UTC",
+        "cvss" => {
+          "access_vector" => "NETWORK",
+          "access_complexity" => "LOW",
+          "authentication" => "NONE",
+          "confidentiality_impact" => "PARTIAL",
+          "integrity_impact" => "PARTIAL",
+          "availability_impact" => "PARTIAL",
+          "base_score" => 7.5,
+          "vector" => "AV:N/AC:L/Au:N/C:P/I:P/A:P"
+        },
+        "cvssv3" => nil,
+        "references" => [
+          {"href" => "http://bazaar.launchpad.net/~maria-captains/maria/5.5/revision/2502.565.64"},
+          {"href" => "http://osvdb.org/102713"},
+          {"href" => "http://rhn.redhat.com/errata/RHSA-2014-0164.html"},
+          {"href" => "http://rhn.redhat.com/errata/RHSA-2014-0173.html"},
+          {"href" => "http://rhn.redhat.com/errata/RHSA-2014-0186.html"},
+          {"href" => "http://rhn.redhat.com/errata/RHSA-2014-0189.html"},
+          {"href" => "http://secunia.com/advisories/52161"},
+          {"href" => "http://security.gentoo.org/glsa/glsa-201409-04.xml"},
+          {"href" => "http://www.mandriva.com/security/advisories?name=MDVSA-2014:029"},
+          {"href" => "http://www.osvdb.org/102714"},
+          {"href" => "http://www.securityfocus.com/bid/65298"},
+          {"href" => "http://www.securitytracker.com/id/1029708"},
+          {"href" => "https://bugzilla.redhat.com/show_bug.cgi?id=1054592"},
+          {"href" => "https://exchange.xforce.ibmcloud.com/vulnerabilities/90901"},
+          {"href" => "https://mariadb.com/kb/en/mariadb-5535-changelog/"}
+        ],
+        "cpes_affected" => [
+          "mariadb:mariadb",
+          "mysql:mysql",
+          "oracle:mysql",
+          "redhat:enterprise_linux",
+          "redhat:enterprise_linux_desktop",
+          "redhat:enterprise_linux_server",
+          "redhat:enterprise_linux_workstation"
+        ],
+        "cpes" => [
+          "mariadb:mariadb",
+          "redhat:enterprise_linux",
+          "redhat:enterprise_linux_desktop",
+          "redhat:enterprise_linux_server",
+          "redhat:enterprise_linux_workstation",
+          "mysql:mysql",
+          "oracle:mysql"
+        ],
+        "cpes_with_version" => [
+          "mariadb:mariadb",
+          "redhat:enterprise_linux:5",
+          "redhat:enterprise_linux:6.0",
+          "redhat:enterprise_linux_desktop:5.0",
+          "redhat:enterprise_linux_desktop:6.0",
+          "redhat:enterprise_linux_server:6.0",
+          "redhat:enterprise_linux_workstation:6.0",
+          "mysql:mysql:5.5.0",
+          "mysql:mysql:5.5.1",
+          "mysql:mysql:5.5.2",
+          "mysql:mysql:5.5.3",
+          "mysql:mysql:5.5.4",
+          "mysql:mysql:5.5.5",
+          "mysql:mysql:5.5.6",
+          "mysql:mysql:5.5.7",
+          "mysql:mysql:5.5.8",
+          "mysql:mysql:5.5.9",
+          "oracle:mysql:5.5.10",
+          "oracle:mysql:5.5.11",
+          "oracle:mysql:5.5.12",
+          "oracle:mysql:5.5.13",
+          "oracle:mysql:5.5.14",
+          "oracle:mysql:5.5.15",
+          "oracle:mysql:5.5.16",
+          "oracle:mysql:5.5.17",
+          "oracle:mysql:5.5.18",
+          "oracle:mysql:5.5.19",
+          "oracle:mysql:5.5.20",
+          "oracle:mysql:5.5.21",
+          "oracle:mysql:5.5.22",
+          "oracle:mysql:5.5.23",
+          "oracle:mysql:5.5.24",
+          "oracle:mysql:5.5.25",
+          "oracle:mysql:5.5.26",
+          "oracle:mysql:5.5.27",
+          "oracle:mysql:5.5.28",
+          "oracle:mysql:5.5.29",
+          "oracle:mysql:5.5.30",
+          "oracle:mysql:5.5.31",
+          "oracle:mysql:5.5.32",
+          "oracle:mysql:5.5.33",
+          "oracle:mysql:5.5.34",
+          "oracle:mysql:5.5.35",
+          "oracle:mysql:5.5.36",
+          "oracle:mysql:5.6.0",
+          "oracle:mysql:5.6.1",
+          "oracle:mysql:5.6.2",
+          "oracle:mysql:5.6.3",
+          "oracle:mysql:5.6.4",
+          "oracle:mysql:5.6.5",
+          "oracle:mysql:5.6.6",
+          "oracle:mysql:5.6.7",
+          "oracle:mysql:5.6.8",
+          "oracle:mysql:5.6.9",
+          "oracle:mysql:5.6.10",
+          "oracle:mysql:5.6.11",
+          "oracle:mysql:5.6.12",
+          "oracle:mysql:5.6.13",
+          "oracle:mysql:5.6.14",
+          "oracle:mysql:5.6.15",
+          "oracle:mysql:5.6.16"
+        ]
+      }],
+      "CVE-2019-1694" => [{
+        "id" => "CVE-2019-1694",
+        "summary" => "A vulnerability in the TCP processing engine of Cisco Adaptive Security Appliance (ASA) Software and Cisco Firepower Threat Defense (FTD) Software could allow an unauthenticated, remote attacker to cause an affected device to reload, resulting in a denial of service (DoS) condition. The vulnerability is due to the improper handling of TCP traffic. An attacker could exploit this vulnerability by sending a specific sequence of packets at a high rate through an affected device. A successful exploit could allow the attacker to temporarily disrupt traffic through the device while it reboots.",
+        "cwe" => "CWE-399",
+        "published_at" => "2019-05-03 15:29:00 UTC",
+        "updated_at" => "2019-05-07 16:50:00 UTC",
+        "cvss" => {
+          "access_vector" => "NETWORK",
+          "access_complexity" => "LOW",
+          "authentication" => "NONE",
+          "confidentiality_impact" => "NONE",
+          "integrity_impact" => "NONE",
+          "availability_impact" => "COMPLETE",
+          "base_score" => 7.8,
+          "vector" => "AV:N/AC:L/Au:N/C:N/I:N/A:C"
+        },
+        "cvssv3" => {
+          "attack_vector" => "NETWORK",
+          "attack_complexity" => "LOW",
+          "privileges_required" => "NONE",
+          "user_interaction" => "NONE",
+          "scope" => "CHANGED",
+          "confidentiality_impact" => "NONE",
+          "integrity_impact" => "NONE",
+          "availability_impact" => "HIGH",
+          "base_score" => 8.6,
+          "base_severity" => "HIGH",
+          "vector" => "CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:C/C:N/I:N/A:H"
+        },
+        "references" => [
+          {"href" => "http://www.securityfocus.com/bid/108160"},
+          {"href" => "https://tools.cisco.com/security/center/content/CiscoSecurityAdvisory/cisco-sa-20190501-asa-frpwrtd-dos"}
+        ],
+        "cpes_affected" => [
+          "cisco:adaptive_security_appliance_software",
+          "cisco:firepower_threat_defense"
+        ],
+        "cpes" => [
+          "cisco:adaptive_security_appliance_software",
+          "cisco:asa_5505",
+          "cisco:asa_5510",
+          "cisco:asa_5512-x",
+          "cisco:asa_5515-x",
+          "cisco:asa_5520",
+          "cisco:asa_5525-x",
+          "cisco:asa_5540",
+          "cisco:asa_5545-x",
+          "cisco:asa_5550",
+          "cisco:asa_5555-x",
+          "cisco:asa_5580",
+          "cisco:asa_5585-x",
+          "cisco:firepower_threat_defense"
+        ],
+        "cpes_with_version" => [
+          "cisco:adaptive_security_appliance_software",
+          "cisco:asa_5505:-",
+          "cisco:asa_5510:-",
+          "cisco:asa_5512-x:-",
+          "cisco:asa_5515-x:-",
+          "cisco:asa_5520:-",
+          "cisco:asa_5525-x:-",
+          "cisco:asa_5540:-",
+          "cisco:asa_5545-x:-",
+          "cisco:asa_5550:-",
+          "cisco:asa_5555-x:-",
+          "cisco:asa_5580:-",
+          "cisco:asa_5585-x:-",
+          "cisco:firepower_threat_defense"
+        ]
+      }]
+    }
+
+    unknown_good_cves = [
+      "CVE-2015-0599",
+    ]
+
+    invalid_cves = [
+      "badrequests",
+    ]
+
+    it_behaves_like "a good parameter handler", url, good_cves, unknown_good_cves, invalid_cves
+  end
+
   describe "/v1/cpe/:cpe_str" do
     url = "/v1/cpe/"
     good_cpes = {

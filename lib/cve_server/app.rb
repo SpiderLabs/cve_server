@@ -25,15 +25,10 @@ module CVEServer
     get '/v1/cves/:cves' do |cves|
       answer = []
       elements = cves.split(',').uniq
-      bad_request if elements.empty? || elements.size > 10
-      elements.each do |e|
-              e.match(/^CVE-\d{4}-(0\d{3}|[1-9]\d{3,})$/) do |match|
-                cve = match[0]
-                bad_request unless valid_cve?(cve)
-                cve = CVEServer::Cve.find(cve.upcase)
-                answer.append(cve) if cve
-              end
-          end
+      normalized_cves = elements.select {|e| e.match? (/^CVE-\d{4}-(0\d{3}|[1-9]\d{3,})$/) }.map(&:upcase)
+      bad_request if normalized_cves.empty? || normalized_cves.size > 10
+      answer = CVEServer::Cve.all(id: { '$in': normalized_cves } )
+      not_found if answer.empty?
       json_resp answer
     end
 
