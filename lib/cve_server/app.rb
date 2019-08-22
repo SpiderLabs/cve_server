@@ -22,6 +22,21 @@ module CVEServer
       end
     end
 
+    get '/v1/cves/:cves' do |cves|
+      answer = []
+      elements = cves.split(',').uniq
+      bad_request if elements.empty? || elements.size > 10
+      elements.each do |e|
+              e.match(/^CVE-\d{4}-(0\d{3}|[1-9]\d{3,})$/) do |match|
+                cve = match[0]
+                bad_request unless valid_cve?(cve)
+                cve = CVEServer::Cve.find(cve.upcase)
+                answer.append(cve) if cve
+              end
+          end
+      json_resp answer
+    end
+
     get '/v1/cpe/:cpe_str' do |cpe_str|
       if params.has_key?('double_encoded_fields') && params['double_encoded_fields']
         cpe_str = URI.decode(URI.decode(cpe_str))
