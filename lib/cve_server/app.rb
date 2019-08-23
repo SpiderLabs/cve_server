@@ -25,7 +25,7 @@ module CVEServer
     get '/v1/cves/:cves' do |cves|
       entries = []
       elements = cves.split(',').uniq
-      normalized_cves = elements.select {|e| e.match? (/^CVE-\d{4}-(0\d{3}|[1-9]\d{3,})$/) }.map(&:upcase)
+      normalized_cves = elements.select {|cve| valid_cve?(cve) }.map(&:upcase)
       bad_request if normalized_cves.empty? || normalized_cves.size > 10
       entries = CVEServer::Cve.all(id: { '$in': normalized_cves } )
       not_found if entries.empty?
