@@ -22,6 +22,16 @@ module CVEServer
       end
     end
 
+    get '/v1/cves/:cves' do |cves|
+      entries = []
+      elements = cves.split(',').uniq
+      normalized_cves = elements.select {|cve| valid_cve?(cve) }.map(&:upcase)
+      bad_request if normalized_cves.empty? || normalized_cves.size > 10
+      entries = CVEServer::Cve.all(id: { '$in': normalized_cves } )
+      not_found if entries.empty?
+      json_resp entries
+    end
+
     get '/v1/cpe/:cpe_str' do |cpe_str|
       if params.has_key?('double_encoded_fields') && params['double_encoded_fields']
         cpe_str = URI.decode(URI.decode(cpe_str))

@@ -12,6 +12,10 @@ module CVEServer
       remove_id(super(id: cve))
     end
 
+    def self.all(pattern={})
+      super(pattern).map {|entry| remove_id(entry) }
+    end
+
     def self.all_cpes_equal(cpes)
       cpes.split(",").collect do |cpe|
         self.all_cpe_equal(cpe)
