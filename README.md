@@ -25,6 +25,10 @@ curl --ssl -s https://raw.githubusercontent.com/SpiderLabs/cve_server/master/scr
 
   * http://localhost:port/v1/cve/CVE-2015-3900
 
+* Search for several CVEs
+
+  * http://localhost:port/v1/cves/CVE-2019-14407,CVE-2018-18656
+
 * Search for CVEs related to a CPE without versions
 
   * http://localhost:port/v1/cpe/apache:spark
