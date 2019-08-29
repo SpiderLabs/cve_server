@@ -1,21 +1,21 @@
 source 'https://rubygems.org'
 
-gem 'sinatra', '~> 2.0.3'
-gem 'sinatra-contrib', '~> 2.0.3'
-gem 'nokogiri', '~> 1.8.5'
+gem 'sinatra', '~> 2.0.7'
+gem 'sinatra-contrib', '~> 2.0.7'
+gem 'nokogiri', '~> 1.10.4'
 gem 'mongo', '~> 2.1.2'
-gem 'puma', '~> 3.11.4'
+gem 'puma', '~> 4.1.0'
 
 group :production do
-  gem 'capistrano', '~> 3.9.0'
-  gem 'capistrano-bundler', '~> 1.2.0'
+  gem 'capistrano', '~> 3.11.0'
+  gem 'capistrano-bundler', '~> 1.6.0'
   gem 'capistrano-rvm', '~> 0.1.2'
-  gem 'capistrano3-puma', '~> 3.1.1'
+  gem 'capistrano3-puma', '~> 4.0.0'
 end
 
 group :development, :test do
-  gem 'pry', '~> 0.11.3'
-  gem 'rspec', '~> 3.7.0'
+  gem 'pry', '~> 0.12.2'
+  gem 'rspec', '~> 3.8.0'
   gem 'rack-test', '~> 1.1.0'
-  gem 'simplecov', '~> 0.16.1', :require => false
+  gem 'simplecov', '~> 0.17.0', :require => false
 end
