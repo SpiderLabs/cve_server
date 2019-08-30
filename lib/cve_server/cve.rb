@@ -35,25 +35,24 @@ module CVEServer
     end
 
     def self.all_cpes_affected(cpes = nil)
-      result = if cpes.nil?
-                 all.map { |h| h['cpes_affected'] }
-               else
-                 unless cpes.is_a?(Array) or cpes.is_a?(String)
-                   raise TypeError, "'cpes' must be an Array or String"
-                 end
-                 [cpes].flatten.map do |cpe|
-                   all(cpes_affected: /^#{Regexp.escape(cpe.to_s)}$/i).collect do |h|
-                     h['id']
-                   end
-                 end
-               end
-      result.flatten.compact.uniq.sort
+      case cpes
+      when Array
+        cpes.map { |cpe| all_cpe_matches_with(:cpes_affected, cpe) }.flatten.compact.uniq.sort
+      when String
+        all_cpe_matches_with(:cpes_affected, cpes)
+      when NilClass
+        all.map { |h| h['cpes_affected'] }.flatten.compact.uniq.sort
+      else
+        raise TypeError, "'cpes' must be an Array or String"
+      end
     end
 
     def self.all_cpe_with_version_equal(cpe)
-      all(cpes_with_version: /^#{Regexp.escape(cpe)}$/i).collect do |h|
-        h['id']
-      end.uniq.sort
+      all_cpe_matches_with(:cpes_with_version, cpe)
+    end
+
+    def self.all_cpe_matches_with(field, cpe)
+      all(field.to_sym => /^#{Regexp.escape(cpe.to_s)}$/i).collect { |e| e['id'] }.compact.uniq.sort
     end
 
     def self.reduce_cpes
