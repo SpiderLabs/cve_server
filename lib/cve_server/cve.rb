@@ -23,14 +23,12 @@ module CVEServer
     end
 
     def self.all_cpe_equal(cpe)
-      all(cpes: /^#{Regexp.escape(cpe)}$/i).collect do |h|
-        h['id']
-      end.uniq.sort
+      all_cpe_matches_with(:cpes, cpe)
     end
 
     def self.all_cpes_with_version_equal(cpes)
       cpes.split(",").collect do |cpe|
-        self.all_cpe_with_version_equal(cpe)
+        all_cpe_matches_with(:cpes_with_version, cpe)
       end.flatten.uniq.sort
     end
 
@@ -47,12 +45,8 @@ module CVEServer
       end
     end
 
-    def self.all_cpe_with_version_equal(cpe)
-      all_cpe_matches_with(:cpes_with_version, cpe)
-    end
-
     def self.all_cpe_matches_with(field, cpe)
-      all_sorted_by(:id, {field.to_sym => /^#{Regexp.escape(cpe.to_s)}$/}).distinct(:id)
+      all_sorted_by(:id, { field.to_sym => /^#{Regexp.escape(cpe.to_s)}$/ }).distinct(:id)
     end
 
     def self.reduce_cpes
