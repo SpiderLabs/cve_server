@@ -69,9 +69,9 @@ module CVEServer
       %Q(
         function() {
           var application_names = [];
-          this.#{field}.forEach(function(cpe, index) {
-            if ((application_names.indexOf(cpe) < 0) && (cpe))
-              application_names.push(cpe);
+          this.#{field}.forEach(function(field, index) {
+            if ((application_names.indexOf(field) < 0) && (field))
+              application_names.push(field);
           });
           for (var i = 0;  i < application_names.length; i++) {
             emit(application_names[i], {count: 1});
