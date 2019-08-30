@@ -16,8 +16,8 @@ module CVEServer
         db[@collection].find(pattern)
       end
 
-      def all_sorted_by(attr)
-        db[@collection].find.sort(attr.to_sym => ::Mongo::Index::ASCENDING)
+      def all_sorted_by(attr, pattern={})
+        db[@collection].find(pattern).sort(attr.to_sym => ::Mongo::Index::ASCENDING)
       end
 
       def exist?(args)
