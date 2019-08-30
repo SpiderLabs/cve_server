@@ -57,12 +57,9 @@ module CVEServer
     end
 
     def self.reduce_cpes
-      total_count = 0
       ["cpes", "cpes_with_version"].each do |field|
-        total_count += map_reduce(mapper(field), reducer, map_reducer_opts(field)).count
+        map_reduce(mapper(field), reducer, map_reducer_opts(field))
       end
-
-      return total_count
     end
 
     def self.mapper(field)
