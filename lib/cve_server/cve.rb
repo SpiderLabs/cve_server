@@ -18,12 +18,8 @@ module CVEServer
 
     def self.all_cpes_equal(cpes)
       cpes.split(",").collect do |cpe|
-        self.all_cpe_equal(cpe)
+        all_cpe_matches_with(:cpes, cpe)
       end.flatten.uniq.sort
-    end
-
-    def self.all_cpe_equal(cpe)
-      all_cpe_matches_with(:cpes, cpe)
     end
 
     def self.all_cpes_with_version_equal(cpes)
