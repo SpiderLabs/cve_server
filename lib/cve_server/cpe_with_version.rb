@@ -8,7 +8,7 @@ module CVEServer
     collection_name :cpes_with_version
 
     def self.all
-      super.collect {|cpe| cpe['_id']}.sort
+      super.distinct('_id').sort
     end
   end
 end
