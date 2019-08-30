@@ -23,12 +23,11 @@ module CVEServer
     end
 
     get '/v1/cves/:cves' do |cves|
-      entries = []
       elements = cves.split(',').uniq
       normalized_cves = elements.select {|cve| valid_cve?(cve) }.map(&:upcase)
       bad_request if normalized_cves.empty? || normalized_cves.size > 10
       entries = CVEServer::Cve.all(id: { '$in': normalized_cves } )
-      not_found if entries.empty?
+      not_found if entries.none?
       json_resp entries
     end
 
@@ -44,7 +43,7 @@ module CVEServer
       end
 
       cves = CVEServer::Cve.all_cpes_equal(cpe_str.downcase)
-      if cves.count > 0
+      if cves.count.positive?
         json_resp cves
       else
         not_found
@@ -66,7 +65,7 @@ module CVEServer
 
       cpes = cpe_str.split(/\s*,\s*/)
       cves = CVEServer::Cve.all_cpes_affected(cpes)
-      if cves.count > 0
+      if cves.count.positive?
         json_resp cves
       else
         not_found
@@ -89,7 +88,7 @@ module CVEServer
       end
 
       cves = CVEServer::Cve.all_cpes_with_version_equal(cpe_str.downcase)
-      if cves.count > 0
+      if cves.count.positive?
         json_resp cves
       else
         not_found
