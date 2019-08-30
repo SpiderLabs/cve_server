@@ -52,7 +52,7 @@ module CVEServer
     end
 
     def self.all_cpe_matches_with(field, cpe)
-      all(field.to_sym => /^#{Regexp.escape(cpe.to_s)}$/i).collect { |e| e['id'] }.compact.uniq.sort
+      all_sorted_by(:id, {field.to_sym => /^#{Regexp.escape(cpe.to_s)}$/}).distinct(:id)
     end
 
     def self.reduce_cpes
