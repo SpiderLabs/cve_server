@@ -15,8 +15,8 @@ class NvdDownloader
     abort "Invalid NVD feed names provided: [#{nvd_feed_names.join(',')}]" if (NVD_FEED_NAMES & nvd_feed_names).empty?
     @nvd_feed_type = nvd_feed_type
     @nvd_feed_names = nvd_feed_names
-    # CveServer supports only XML schema version 2.0 and JSON schema version 1.0 NVD Data Feeds
-    @schema_version = (@nvd_feed_type == :json) ? '1.0' : '2.0'
+    # CveServer supports only XML schema version 2.0 and JSON schema version 1.1 NVD Data Feeds
+    @schema_version = (@nvd_feed_type == :json) ? '1.1' : '2.0'
   end
 
   # @param [Array<String>]  args
