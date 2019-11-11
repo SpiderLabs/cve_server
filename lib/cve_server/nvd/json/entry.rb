@@ -86,14 +86,7 @@ module CVEServer
         # Affected CPEs created using vendor and product name under the "affects" node
         # @return [Array<String>]
         def cpes_affected
-          vendor_data = @entry.dig('cve', 'affects', 'vendor', 'vendor_data') || []
-          vendor_data.map do |vendor_data_entry|
-            vendor_name = vendor_data_entry['vendor_name']
-            vendor_data_entry
-              .fetch('product', {})
-              .fetch('product_data', [])
-              .map {|product_data_entry| "#{vendor_name}:#{product_data_entry['product_name']}"}
-          end.flatten.uniq
+          cpes.flatten.uniq
         end
 
         def cpes
