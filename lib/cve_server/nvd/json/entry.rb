@@ -42,7 +42,7 @@ module CVEServer
           if problemtype.is_a?(Hash) && problemtype.key?('problemtype_data')
             problemtype['problemtype_data'].collect do |data|
               data['description'].collect { |e| e['value'] }
-            end.flatten.join
+            end.flatten
           end
         end
 
