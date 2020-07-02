@@ -35,6 +35,10 @@ module CVEServer
         db[@collection].bulk_write(inserts, ordered: true)
       end
 
+      def create_index(param)
+        db[@collection].indexes.create_one( { param => 1 } )
+      end
+
       def drop_all
         db[@collection].drop
       end
