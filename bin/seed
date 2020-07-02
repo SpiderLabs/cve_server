@@ -41,3 +41,5 @@ Dir.glob(files).sort.each do |infile|
 end
 puts "Reducing the cpe list"
 CVEServer::Cve.reduce_cpes
+puts 'Creating CVE collection Index'
+CVEServer::Cve.create_index(:cve)
