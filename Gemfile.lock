@@ -43,7 +43,7 @@ GEM
       method_source (~> 0.9.0)
     puma (4.1.0)
       nio4r (~> 2.0)
-    rack (2.0.7)
+    rack (2.2.3)
     rack-protection (2.0.7)
       rack
     rack-test (1.1.0)
