@@ -44,7 +44,7 @@ module CVEServer
       end
 
       def map_reduce(mapper, reducer, options = {})
-        db[@collection].find({}, no_cursor_timeout: true).map_reduce(mapper, reducer, options).execute
+        db[@collection].find({}).map_reduce(mapper, reducer, options).execute
       end
 
       def remove_id(record)
