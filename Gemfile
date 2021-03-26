@@ -19,3 +19,5 @@ group :development, :test do
   gem 'rack-test', '~> 1.1.0'
   gem 'simplecov', '~> 0.17.0', :require => false
 end
+
+gem "tzinfo", "~> 2.0"

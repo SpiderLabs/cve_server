@@ -5,7 +5,7 @@ require 'cve_server/nvd/json/reader'
 describe CVEServer::NVD::JSON::Reader do
   context 'when it receives a valid JSON input from NVD' do
     let(:infile) {
-      json_file = '../../../../fixtures/nvd_data/partial-nvdcve-1.0.json.gz'
+      json_file = '../../../../fixtures/nvd_data/partial-nvdcve-1.0_seed.json.gz'
       File.expand_path(json_file, __FILE__)
     }
     let(:input) { Zlib::GzipReader.open(infile).read }

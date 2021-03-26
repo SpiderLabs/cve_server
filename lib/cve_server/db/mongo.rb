@@ -35,6 +35,15 @@ module CVEServer
         db[@collection].bulk_write(inserts, ordered: true)
       end
 
+      def bulk_upsert(data)
+        upserts = data.reduce([]) do |ops, chunk|
+          query = { :id => chunk[:id] }
+          update = { '$set' => chunk}
+          ops << {:update_one => {:filter => query, :update => update, :upsert => true }}
+        end
+        db[@collection].bulk_write(upserts, ordered: true)
+      end
+
       def create_index(param)
         db[@collection].indexes.create_one( { param => 1 } )
       end
@@ -44,7 +53,8 @@ module CVEServer
       end
 
       def map_reduce(mapper, reducer, options = {})
-        db[@collection].find({}, no_cursor_timeout: true).map_reduce(mapper, reducer, options).execute
+        #db[@collection].find({}, no_cursor_timeout: true).map_reduce(mapper, reducer, options).execute
+        db[@collection].find({}).map_reduce(mapper, reducer, options).execute
       end
 
       def remove_id(record)

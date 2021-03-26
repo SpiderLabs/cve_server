@@ -1,0 +1,38 @@
+#!/usr/bin/env ruby
+$LOAD_PATH.unshift File.expand_path(File.join('..', '..', '/lib'), __FILE__)
+require 'json'
+require 'net/http'
+require 'tzinfo'
+require 'nvd_helper'
+require 'cve_server'
+require 'cve_server/nvd/json/reader'
+
+class NvdUpdater
+  include NVDHelper
+
+  def download_data
+    if local_data_timestamp = last_data_timestamp
+      files = download_pages(local_data_timestamp)
+      update_db(files)
+    else
+      print "There are no local files to aquire a timestamp from for updating.\n"
+    end
+  end
+
+  
+  def update_db(file_list)
+    file_list.sort.each do |file|
+      puts "Uncompressing #{file}"
+      input = Zlib::GzipReader.open(file).read
+      @doc = CVEServer::NVD::JSON::Reader.new(input)
+      puts 'Exporting data into the CVE collection'
+      CVEServer::Cve.bulk_upsert(@doc.all_cve)
+    end
+    puts "Reducing the cpe list"
+    CVEServer::Cve.reduce_cpes
+  end
+end
+
+nvd_updater = NvdUpdater.new
+nvd_updater.download_data
+
