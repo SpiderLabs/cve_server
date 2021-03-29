@@ -1,0 +1,46 @@
+#!/usr/bin/env ruby
+$LOAD_PATH.unshift File.expand_path(File.join('..', '..', '/lib'), __FILE__)
+require 'zlib'
+require 'json'
+require 'net/http'
+require 'tzinfo'
+require 'nvd_helper'
+require 'cve_server'
+require 'cve_server/nvd/json/reader'
+
+class NvdSeed
+  include NVDHelper
+
+  def download_data
+    if local_data_timestamp = last_data_timestamp
+      print "There are files in the nvd_data directory. Quitting.\n"
+      exit
+    else
+      files = download_pages
+      update_db(files)
+    end
+  end
+
+  
+  def update_db(file_list)
+    CVEServer::Cve.drop_all
+    CVEServer::Cpe.drop_all
+    CVEServer::CpeWithVersion.drop_all
+    
+    file_list.sort.each do |file|
+      puts "Uncompressing #{file}"
+      input = Zlib::GzipReader.open(file).read
+      @doc = CVEServer::NVD::JSON::Reader.new(input)
+      puts 'Exporting data into the CVE collection'
+      CVEServer::Cve.bulk_create(@doc.all_cve)
+    end
+    puts "Reducing the cpe list"
+    CVEServer::Cve.reduce_cpes
+    puts 'Creating CVE collection Index'
+    CVEServer::Cve.create_index(:cve)
+  end
+end
+
+nvd_seed = NvdSeed.new
+nvd_seed.download_data
+

@@ -90,15 +90,23 @@ module CVEServer
         end
 
         def cpes
-          cpes_with_version.map { |cpe| cpe.split(':')[0..1].join(':') }.uniq
+          cpes_with_version.map { |cpe| cpe.split(':')[0..1].join(':') unless cpe.nil? }.uniq
         end
 
         def cpes_with_version
           cpe_regex = /^cpe:(?:\/|2\.[23]:)[aho]:(?<vendor>[^:]+):(?<product>[^:]+):(?<version>[^:]+)/
+          cpe_versionStartIncluding = /versionStartIncluding:(?<versionStartIncluding>[^:]+)/
+          cpe_versionStartExcluding = /versionStartExcluding:(?<versionStartExcluding>[^:]+)/
+          cpe_versionEndIncluding = /versionEndIncluding:(?<versionEndIncluding>[^:]+)/
+          cpe_versionEndExcluding = /versionEndExcluding:(?<versionEndExcluding>[^:]+)/
           full_cpes.map do |cpe|
             if match = cpe.match(cpe_regex)
               cpe_parts = [match[:vendor], match[:product]]
               cpe_parts << match[:version] unless match[:version] == '*'
+              cpe_parts << cpe.match(cpe_versionStartIncluding) unless cpe.match(cpe_versionStartIncluding).nil?
+              cpe_parts << cpe.match(cpe_versionStartExcluding) unless cpe.match(cpe_versionStartExcluding).nil?
+              cpe_parts << cpe.match(cpe_versionEndIncluding) unless cpe.match(cpe_versionEndIncluding).nil?
+              cpe_parts << cpe.match(cpe_versionEndExcluding) unless cpe.match(cpe_versionEndExcluding).nil?
               cpe_parts.join(':')
             end
           end.uniq
@@ -126,8 +134,14 @@ module CVEServer
           children.each do |child|
             if child.has_key?('cpe_match')
               child['cpe_match'].each do |cpe_match|
-                cpes << cpe_match['cpe23Uri'] if cpe_match.has_key?('cpe23Uri')
-                cpes << cpe_match['cpe22Uri'] if cpe_match.has_key?('cpe22Uri')
+                cpe_temp = ""
+                cpe_temp += cpe_match['cpe23Uri'] if cpe_match.has_key?('cpe23Uri')
+                cpe_temp += cpe_match['cpe22Uri'] if cpe_match.has_key?('cpe22Uri')
+                cpe_temp += "versionStartIncluding:#{cpe_match['versionStartIncluding']}:" if cpe_match.has_key?('versionStartIncluding')
+                cpe_temp += "versionStartExcluding:#{cpe_match['versionStartExcluding']}:" if cpe_match.has_key?('versionStartExcluding')
+                cpe_temp += "versionEndIncluding:#{cpe_match['versionEndIncluding']}:" if cpe_match.has_key?('versionEndIncluding')
+                cpe_temp += "versionEndExcluding:#{cpe_match['versionEndExcluding']}" if cpe_match.has_key?('versionEndExcluding')
+                cpes << cpe_temp
               end
             elsif child.has_key?('children')
               cpes.push *nested_cpes(child['children']).flatten

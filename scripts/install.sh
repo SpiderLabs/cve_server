@@ -65,19 +65,13 @@ clone_git_repository()
   fi
 }
 
-download_nvd_reports()
+download_and_seed()
 {
-  local __program='./bin/nvd_downloader'
-  ${__program}
-}
-
-
-seed_collections()
-{
-  local __program='./bin/seed'
+  local __program='./bin/nvd_download_and_seed'
   export RACK_ENV=$rack_env
   ${__program}
 }
+
 
 start_puma()
 {
@@ -134,8 +128,7 @@ install() {
   cd $dest_dir
   install_ruby_bundler
   install_ruby_gems
-  download_nvd_reports
-  seed_collections
+  download_and_seed
   start_puma
   if ps awx| grep puma > /dev/null;
   then

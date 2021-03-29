@@ -64,30 +64,18 @@ curl --ssl -s https://raw.githubusercontent.com/SpiderLabs/cve_server/master/scr
 
     bundle install
 
-  3. Download the raw data from the National Vulnerability Database. The supported
-  NVD reports are [XML 2.0 (by default) and JSON 1.0 files](https://nvd.nist.gov/vuln/data-feeds).
-
-    ./bin/nvd_downloader
-
-    or
-
-    ./bin/nvd_downloader -f json
-
-  4. Configure your database.
+  3. Configure your database.
 
     vi config/database.yml
 
-  5. Create and populate the database for you environment.
+  4. Download, create and populate the database for your environment from the National Vulnerability Database via the NVD CVE/CPE API.
+     Note: The new API service is JSON only.    
+     [NVD API URL](https://services.nvd.nist.gov/rest/json/cves/1.0).
 
-    RACK_ENV=development ./bin/seed
-
-    or
-
-    RACK_ENV=development ./bin/seed -f json
-
-  The `-f` flag with the `json` option will populate the database using the experimental JSON reports from NVD and it renames the `score` key to `base_score` in the `cvss` (v2) field, it also includes the `cvssv3` information and some changes for  the links in the `references` field.
-
-  6. Start the server.
+    RACK_ENV=development ./bin/nvd_download_and_seed
+    ** The download may take hours to complete **
+ 
+  5. Start the server.
 
     RACK_ENV=development puma
 

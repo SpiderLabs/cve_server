@@ -5,7 +5,7 @@ require 'cve_server/nvd/json/entry'
 describe CVEServer::NVD::JSON::Entry do
   context 'when it receives a valid entry from the NVD dataset' do
     let(:infile) {
-      json_file = '../../../../fixtures/nvd_data/partial-nvdcve-1.0.json.gz'
+      json_file = '../../../../fixtures/nvd_data/partial-nvdcve-1.0_seed.json.gz'
       File.expand_path(json_file, __FILE__)
     }
     let(:input) { Zlib::GzipReader.open(infile).read }
@@ -36,7 +36,7 @@ describe CVEServer::NVD::JSON::Entry do
     describe '#cwe' do
       it 'should return the CWE-476' do
         expect(subject.cwe).not_to be_nil
-        expect(subject.cwe).to eq('CWE-476')
+        expect(subject.cwe).to eq(['CWE-476'])
       end
     end
 
@@ -251,7 +251,11 @@ describe CVEServer::NVD::JSON::Entry do
       describe '#cpes_with_version' do
         it 'should return all CPEs with versions' do
           expected_cpes = [
-            "cisco:adaptive_security_appliance_software",
+            "cisco:adaptive_security_appliance_software:versionEndExcluding:9.4.4.34",
+            "cisco:adaptive_security_appliance_software:versionStartIncluding:9.5:versionEndExcluding:9.6.4.25", 
+            "cisco:adaptive_security_appliance_software:versionStartIncluding:9.7:versionEndExcluding:9.8.4", 
+            "cisco:adaptive_security_appliance_software:versionStartIncluding:9.9:versionEndExcluding:9.9.2.50", 
+            "cisco:adaptive_security_appliance_software:versionStartIncluding:9.10:versionEndExcluding:9.10.1.17", 
             "cisco:asa_5505:-",
             "cisco:asa_5510:-",
             "cisco:asa_5512-x:-",
@@ -264,7 +268,8 @@ describe CVEServer::NVD::JSON::Entry do
             "cisco:asa_5555-x:-",
             "cisco:asa_5580:-",
             "cisco:asa_5585-x:-",
-            "cisco:firepower_threat_defense"
+            "cisco:firepower_threat_defense:versionEndExcluding:6.2.3.12",
+            "cisco:firepower_threat_defense:versionStartIncluding:6.3.0:versionEndExcluding:6.3.0.3"
           ]
           expect(subject.cpes_with_version).not_to be_nil
           expect(subject.cpes_with_version).to eq(expected_cpes)

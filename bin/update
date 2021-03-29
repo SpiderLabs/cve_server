@@ -4,21 +4,15 @@ require 'zlib'
 require 'cve_server'
 require 'cve_server/nvd/json/reader'
 
-files = File.join(CVEServer::Boot.config.raw_data_path, "*seed.json.gz")
-
-CVEServer::Cve.drop_all
-CVEServer::Cpe.drop_all
-CVEServer::CpeWithVersion.drop_all
+files = File.join(CVEServer::Boot.config.raw_data_path, "*update.json.gz")
 
 Dir.glob(files).sort.each do |infile|
   puts "Uncompressing #{infile}"
   input = Zlib::GzipReader.open(infile).read
   @doc = CVEServer::NVD::JSON::Reader.new(input)
   puts 'Exporting data into the CVE collection'
-  CVEServer::Cve.bulk_create(@doc.all_cve)
+  CVEServer::Cve.bulk_upsert(@doc.all_cve)
 end
 puts "Reducing the cpe list"
 CVEServer::Cve.reduce_cpes
-puts 'Creating CVE collection Index'
-CVEServer::Cve.create_index(:cve)
 
