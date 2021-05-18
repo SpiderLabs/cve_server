@@ -4,7 +4,7 @@ gem 'sinatra', '~> 2.0.7'
 gem 'sinatra-contrib', '~> 2.0.7'
 gem 'nokogiri', '~> 1.10.8'
 gem 'mongo', '~> 2.10.1'
-gem 'puma', '~> 4.3.5'
+gem 'puma', '~> 4.3.8'
 
 group :production do
   gem 'capistrano', '~> 3.11.0'
